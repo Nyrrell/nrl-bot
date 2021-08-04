@@ -1,15 +1,7 @@
-import dotenv from "dotenv";
-dotenv.config()
+import {} from "dotenv/config";
 
-export const prefix = '!'
-
-let token
-if (process.env.npm_lifecycle_event === 'dev') {
-    token = process.env.DISCORD_TOKEN_DEV
-} else {
-    token = process.env.DISCORD_TOKEN_PROD
-}
-
-export { token };
+export const token = process.env.DISCORD_TOKEN;
+export const twitchClientId = process.env.TWITCH_CLIENT_ID;
+export const twitchOAuthAccessToken = process.env.TWITCH_ACCESS_TOKEN;
 
 
