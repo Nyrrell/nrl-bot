@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Client, Collection, Intents, MessageEmbed } from 'discord.js';
 import { token } from './config.js';
-import('./services/task.js')
+//import('./services/task.js')
 
 export const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 client.commands = new Collection();
@@ -16,7 +16,7 @@ for (const file of commandFiles) {
 }
 
 client.on('ready', async () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log('Logged in as', client.user.tag);
     console.log('Logged on', client.guilds.cache.map(guild => guild.name).join(', '));
 });
 
@@ -47,5 +47,5 @@ client.on('messageCreate', async message => {
     }
 });
 
-console.log('Version :',process.env.npm_package_version)
 client.login(token);
+console.log(process.env.npm_package_version)
