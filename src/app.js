@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { Client, Collection, Intents, MessageEmbed } from 'discord.js';
 import { token } from './config.js';
-//import('./services/task.js')
+import('./services/task.js')
 
 export const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 client.commands = new Collection();
@@ -48,4 +48,4 @@ client.on('messageCreate', async message => {
 });
 
 client.login(token);
-console.log(process.env.npm_package_version)
+console.log('version :', process.env.npm_package_version)
