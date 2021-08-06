@@ -3,7 +3,7 @@ import cron from 'node-cron'
 import { twitchAPI } from './twitch-api.js';
 import { twitchClientId, twitchOAuthAccessToken } from "../config.js";
 import { client } from '../app.js'
-import { liveDateCompare } from "../utils/helpers.js";
+import { checkUptime } from "../utils/helpers.js";
 
 const api = twitchAPI(twitchClientId, twitchOAuthAccessToken);
 
@@ -41,7 +41,8 @@ const usersData = {
         descr: 'Le programme le plus Awéwé de Twitch a commencé \u200b \n\n⬇️ Ramène-toi !',
         thumb: 'https://cdn.discordapp.com/attachments/703265324937642067/794746906639073340/logo2020.png',
         channel: '870308271163052052',
-        lastLive: "2021-08-05T08:00:00Z"
+        lastLive: "2021-08-05T08:00:00Z",
+        uptime: "2021-08-05T08:00:00Z"
     },
     nyrrell: {
         color: 0x8205B3,
@@ -49,7 +50,8 @@ const usersData = {
         descr: 'Presque sponso deBuyer \u200b \n\n⬇️ En live maintenant',
         thumb: 'https://static-cdn.jtvnw.net/jtv_user_pictures/4c949a71-d370-41df-8c76-a0aa82f721d3-profile_image-300x300.png',
         channel: '870308411512860732',
-        lastLive: "2021-08-05T08:00:00Z"
+        lastLive: "2021-08-05T08:00:00Z",
+        uptime: "2021-08-05T08:00:00Z"
     }
 }
 
@@ -61,16 +63,20 @@ const checkLive = cron.schedule('*/2 * * * *', async () => {
         const userData = usersData[streamer]
         const {isLive, ...streamData} = await api.getStream(streamer);
 
-        if (isLive && liveDateCompare(streamData['started_at'], userData['lastLive'])) {
+        if (isLive && checkUptime(userData['uptime'])) {
             userData['lastLive'] = streamData['started_at']
+            userData['uptime'] = new Date()
 
             const embed = messageEmbed(streamData, userData)
             await client.channels.cache
-                .get(userData['channel']) // '872851017925001227'
+                //.get('872851017925001227') // channel test
+                .get(userData['channel'])
                 .send({
                     content: `Hey ! ${streamData['user_name']} lance son live @everyone`,
-                    embeds: [embed],
+                    embeds: [embed]
                 })
+        } else if (isLive) {
+            userData['uptime'] = new Date()
         }
     }
 });

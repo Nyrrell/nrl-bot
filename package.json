@@ -12,7 +12,7 @@
   "author": "Nyrrell",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^13.0.0-dev.t1627949059.35fa3b3",
+    "discord.js": "^13.0.0",
     "dotenv": "^10.0.0",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1"
