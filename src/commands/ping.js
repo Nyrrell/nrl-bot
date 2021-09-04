@@ -1,7 +1,9 @@
-export const command = {
-    name: 'ping',
-    description: 'Répond avec le message pong',
+import { SlashCommandBuilder } from "@discordjs/builders";
+export const command =  {
+    data: new SlashCommandBuilder()
+        .setName('ping')
+        .setDescription('Répond avec le message pong'),
     async execute(interaction) {
-        return interaction.reply('pong');
+        await interaction.reply('Pong!');
     },
 };
