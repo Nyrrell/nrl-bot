@@ -1,6 +1,6 @@
 {
   "name": "nrl-bot",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Bot de la CRK TV",
   "main": "src/app.js",
   "type": "module",
@@ -12,9 +12,19 @@
   "author": "Nyrrell",
   "license": "MIT",
   "dependencies": {
-    "discord.js": "^13.0.0",
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@twurple/api": "^5.0.0-pre.15",
+    "@twurple/auth": "^5.0.0-pre.15",
+    "@twurple/chat": "^5.0.0-pre.15",
+    "@twurple/common": "^5.0.0-pre.15",
+    "@twurple/eventsub": "^5.0.0-pre.15",
+    "discord-api-types": "^0.22.0",
+    "discord.js": "^13.0.1",
     "dotenv": "^10.0.0",
     "node-cron": "^3.0.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2"
   }
 }

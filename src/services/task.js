@@ -1,11 +1,29 @@
 import cron from 'node-cron'
 
-import { twitchAPI } from './twitch-api.js';
-import { twitchClientId, twitchOAuthAccessToken } from "../config.js";
+import { twitchClientId, twitchAccessToken } from "../config.js";
 import { client } from '../app.js'
 import { checkUptime } from "../utils/helpers.js";
 
-const api = twitchAPI(twitchClientId, twitchOAuthAccessToken);
+import { StaticAuthProvider } from '@twurple/auth';
+const authProvider = new StaticAuthProvider(twitchClientId, twitchAccessToken);
+
+import { ApiClient } from '@twurple/api';
+import { getRawData } from '@twurple/common'
+
+const apiClient = new ApiClient({ authProvider });
+
+import { streamer } from "./db.js";
+
+const isStreamLive = async (userName) => {
+    const user = await apiClient.users.getUserByName(userName);
+    if (!user) return false;
+    let streamData = await user.getStream();
+    streamData !== null ? streamData = getRawData(streamData) : streamData = false;
+    return {
+        isLive: Object.keys(streamData).length > 0 && streamData.type === 'live',
+        ...streamData
+    }
+}
 
 const messageEmbed = (streamData, userData) => {
     return {
@@ -25,7 +43,6 @@ const messageEmbed = (streamData, userData) => {
             }
         ],
         image: {
-            //url: 'https://cdn.discordapp.com/attachments/703265324937642067/794747634518196234/4190dedcba4e2115e2a2cac6e2cf755f.gif',
             url: `${streamData['thumbnail_url'].replace('{width}', 366).replace('{height}', 220)}&${streamData['id']}`,
         },
         timestamp: new Date(),
@@ -34,50 +51,28 @@ const messageEmbed = (streamData, userData) => {
         }
     }
 }
-const usersData = {
-    cirka_: {
-        color: 0x1f69ff,
-        title: 'La Cirka TV est en LIVE !',
-        descr: 'Le programme le plus Awéwé de Twitch a commencé \u200b \n\n⬇️ Ramène-toi !',
-        thumb: 'https://cdn.discordapp.com/attachments/703265324937642067/794746906639073340/logo2020.png',
-        channel: '870308271163052052',
-        lastLive: "2021-08-05T08:00:00Z",
-        uptime: "2021-08-05T08:00:00Z"
-    },
-    nyrrell: {
-        color: 0x8205B3,
-        title: 'La Nyrrell Cooking TV est en LIVE !',
-        descr: 'Presque sponso deBuyer \u200b \n\n⬇️ En live maintenant',
-        thumb: 'https://static-cdn.jtvnw.net/jtv_user_pictures/4c949a71-d370-41df-8c76-a0aa82f721d3-profile_image-300x300.png',
-        channel: '870308411512860732',
-        lastLive: "2021-08-05T08:00:00Z",
-        uptime: "2021-08-05T08:00:00Z"
-    }
-}
 
-const checkLive = cron.schedule('*/2 * * * *', async () => {
-    const streamers = Object.keys(usersData)
+cron.schedule('*/2 * * * *', async () => {
+
+    const streamers = await streamer.findAll()
 
     for (const streamer of streamers) {
 
-        const userData = usersData[streamer]
-        const {isLive, ...streamData} = await api.getStream(streamer);
+        const {isLive, ...streamData} = await isStreamLive(streamer);
 
-        if (isLive && checkUptime(userData['uptime'])) {
-            userData['lastLive'] = streamData['started_at']
-            userData['uptime'] = new Date()
+        if (isLive && checkUptime(streamer['uptime'])) {
+            streamer['lastLive'] = streamData['started_at']
+            await streamer.update({ uptime: new Date() }, { where: { name: streamer['name'] } })
 
-            const embed = messageEmbed(streamData, userData)
+            const embed = messageEmbed(streamData, streamer)
             await client.channels.cache
-                //.get('872851017925001227') // channel test
-                .get(userData['channel'])
-                .send({
+                .get(process.env.NODE_ENV === 'dev' ? '872851017925001227' : streamer['channel'])
+                ?.send({
                     content: `Hey ! ${streamData['user_name']} lance son live @everyone`,
                     embeds: [embed]
                 })
         } else if (isLive) {
-            userData['uptime'] = new Date()
+            await streamer.update({ uptime: new Date() }, { where: { name: streamer['name'] } })
         }
     }
 });
-

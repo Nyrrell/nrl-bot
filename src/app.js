@@ -1,51 +1,30 @@
 import * as fs from 'fs';
-import { Client, Collection, Intents, MessageEmbed } from 'discord.js';
+import { Client, Collection, Intents } from 'discord.js';
 import { token } from './config.js';
-import('./services/task.js')
+
+import('./services/task.js');
+import('./services/deploy-commands.js');
 
 export const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 client.commands = new Collection();
-client.slashCommands = [];
 
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-    const {command} = await import(`./commands/${file}`);
-    client.slashCommands.push({name: command.name, description: command.description});
-    client.commands.set(command.name, command);
+    const { command } = await import(`./commands/${file}`)
+    client.commands.set(command.data.name, command);
 }
 
-client.on('ready', async () => {
-    console.log('Logged in as', client.user.tag);
-    console.log('Logged on', client.guilds.cache.map(guild => guild.name).join(', '));
-});
+const eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
 
-client.on('interactionCreate', async interaction => {
-
-    if (!interaction.isCommand()) return;
-
-    if (!client.commands.has(interaction.commandName)) return;
-
-    try {
-        await client.commands.get(interaction.commandName).execute(interaction);
-    } catch (error) {
-        console.error(error);
-        await interaction.reply({
-            content: 'There was an error while executing this command!',
-            ephemeral: true
-        });
+for (const file of eventFiles) {
+    const { event } = await import(`./events/${file}`);
+    if (event.once) {
+        client.once(event.name, (...args) => event.execute(...args));
+    } else {
+        client.on(event.name, (...args) => event.execute(...args));
     }
-});
+}
 
-client.on('messageCreate', async message => {
-    if (!client.application?.owner) await client.application?.fetch();
-
-    if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
-        console.log('hello')
-        const command = await client.application?.commands.set(client.slashCommands);
-        console.log(command);
-    }
-});
-
-client.login(token);
+await client.login(token);
 console.log('version :', process.env.npm_package_version)
