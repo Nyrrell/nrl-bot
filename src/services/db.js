@@ -12,5 +12,5 @@ const sequelize = new Sequelize({
 
 export const streamer = _streamers.init(sequelize, DataTypes)
 export const dailySub = _dailySub.init(sequelize, DataTypes)
-//await sequelize.sync()
+//await dailySub.sync()
 

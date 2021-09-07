@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Client, Collection, Intents } from 'discord.js';
 import { token } from './config.js';
 
-import('./services/task.js');
+import('./tasks/twitchLive.js');
 import('./services/deploy-commands.js');
 
 export const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
@@ -27,4 +27,4 @@ for (const file of eventFiles) {
 }
 
 await client.login(token);
-console.log('version :', process.env.npm_package_version)
+console.log('version :', process.env.npm_package_version);

@@ -1,6 +1,6 @@
 import cron from 'node-cron'
 
-import { twitchClientId, twitchAccessToken } from "../config.js";
+import { twitchClientId, twitchAccessToken, env } from "../config.js";
 import { client } from '../app.js'
 import { checkUptime } from "../utils/helpers.js";
 
@@ -12,7 +12,7 @@ import { getRawData } from '@twurple/common'
 
 const apiClient = new ApiClient({ authProvider });
 
-import { streamer } from "./db.js";
+import { streamer } from "../services/db.js";
 
 const isStreamLive = async (userName) => {
     const user = await apiClient.users.getUserByName(userName);
@@ -61,16 +61,20 @@ cron.schedule('*/2 * * * *', async () => {
         const {isLive, ...streamData} = await isStreamLive(streamer);
 
         if (isLive && checkUptime(streamer['uptime'])) {
-            streamer['lastLive'] = streamData['started_at']
-            await streamer.update({ uptime: new Date() }, { where: { name: streamer['name'] } })
+
+            await streamer.update({
+                uptime: new Date(),
+                lastLive: new Date(streamData['started_at'])
+            }, { where: { name: streamer['name'] } })
 
             const embed = messageEmbed(streamData, streamer)
             await client.channels.cache
-                .get(process.env.NODE_ENV === 'dev' ? '872851017925001227' : streamer['channel'])
+                .get(env === 'dev' ? '872851017925001227' : streamer['channel'])
                 ?.send({
                     content: `Hey ! ${streamData['user_name']} lance son live @everyone`,
                     embeds: [embed]
                 })
+
         } else if (isLive) {
             await streamer.update({ uptime: new Date() }, { where: { name: streamer['name'] } })
         }

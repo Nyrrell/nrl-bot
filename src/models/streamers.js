@@ -16,8 +16,8 @@ export default class streamers extends Model {
       type: DataTypes.STRING(255),
       defaultValue: "870308411512860732"
     },
-    lastLive: DataTypes.STRING(255),
-    uptime: DataTypes.STRING(255)
+    lastLive: DataTypes.DATE,
+    uptime: DataTypes.DATE
   }, {
     sequelize
   });

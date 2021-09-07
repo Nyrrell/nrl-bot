@@ -6,9 +6,14 @@ export default class dailySub extends Model {
         super.init({
             url: {
                 type: DataTypes.TEXT,
-                unique: true
+                unique: true,
+                allowNull: false,
+                primaryKey: true
             },
-            send: DataTypes.DATEONLY,
+            send: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false
+            }
         }, {
             sequelize
         });

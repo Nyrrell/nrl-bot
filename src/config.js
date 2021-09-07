@@ -7,3 +7,4 @@ export const guildId = NODE_ENV === 'dev' ? process.env.DISCORD_GUILD_ID_DEV : D
 
 export const twitchClientId = TWITCH_CLIENT_ID;
 export const twitchAccessToken = TWITCH_ACCESS_TOKEN;
+export const env = NODE_ENV
