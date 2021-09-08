@@ -13,7 +13,7 @@ export const command = {
 
     async execute(interaction) {
 
-        if (interaction.channel.id !== channel['debug'] && channel['dailySub'])
+        if (interaction.channel.id !== channel['debug'] && interaction.channel.id !== channel['dailySub'])
             return interaction.reply({ content: "Pas le bon channel", ephemeral: true })
 
         const newDailyNeeded = interaction.options.getBoolean('nouveau')

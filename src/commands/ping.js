@@ -4,6 +4,6 @@ export const command =  {
         .setName('ping')
         .setDescription('Répond avec le message pong'),
     async execute(interaction) {
-        await interaction.reply('Pong!');
+        await interaction.reply('Pong !');
     },
 };
