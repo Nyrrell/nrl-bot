@@ -43,7 +43,7 @@ const messageEmbed = (streamData, userData) => {
             }
         ],
         image: {
-            url: `${streamData['thumbnail_url'].replace('{width}', 366).replace('{height}', 220)}&${streamData['id']}`,
+            url: `attachment://${streamData['user_login']}.webp`,
         },
         timestamp: new Date(),
         footer: {
@@ -72,7 +72,11 @@ cron.schedule('*/2 * * * *', async () => {
                 .get(env === 'dev' ? channel["debug"] : streamer['channel'])
                 ?.send({
                     content: `Hey ! ${streamData['user_name']} lance son live @everyone`,
-                    embeds: [embed]
+                    embeds: [embed],
+                    files: [{
+                        attachment: streamData['thumbnail_url'].replace('{width}', 366).replace('{height}', 220),
+                        name: `${streamData['user_login']}.webp`
+                    }]
                 })
 
         } else if (isLive) {
