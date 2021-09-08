@@ -18,34 +18,25 @@ const rest = new REST({ version: '9' }).setToken(token);
         await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
             { body: commands },
-        )
-
-        await rest.put(
-            Routes.guildApplicationCommandsPermissions(clientId, guildId),
-            {
-                body: [
-                    {
-                        id: '884461503015706685',
-                        permissions: [{
-                            id: '343169638336561154',
-                            type: '2',
-                            permission: true
-                        }]
-                    },
-                    {
-                        id: '884912947145617488',
-                        permissions: [{
-                            id: '343169638336561154',
-                            type: '2',
-                            permission: true
-                        }],
-                    },
-                ]
-            }
-        )
-        console.log('Commandes enregistrer avec succes');
-
-
+        ).then(res => {
+            const permissionNeeded = res.filter(command => command['default_permission'] === false)
+            let permissions = []
+            permissionNeeded.forEach(command => permissions.push({
+                id: command.id,
+                permissions: [{
+                    id: '343169638336561154',
+                    type: '2',
+                    permission: true
+                }]
+            }))
+            return permissions
+        }).then(async permissions => {
+            await rest.put(
+                Routes.guildApplicationCommandsPermissions(clientId, guildId),
+                { body: permissions }
+            )
+            console.log('Commandes enregistrer avec succes');
+        })
     } catch (error) {
         console.error(error);
     }
