@@ -10,7 +10,7 @@ export const event = {
         } catch (error) {
             console.error(error);
             return interaction.reply({
-                content: 'There was an error while executing this command!',
+                content: 'Une erreur est survenue lors de l\'exécution de l\'interaction',
                 ephemeral: true
             });
         }

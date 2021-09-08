@@ -1,6 +1,6 @@
 import cron from 'node-cron'
 
-import { twitchClientId, twitchAccessToken, env } from "../config.js";
+import { twitchClientId, twitchAccessToken, env, channel } from "../config.js";
 import { client } from '../app.js'
 import { checkUptime } from "../utils/helpers.js";
 
@@ -69,7 +69,7 @@ cron.schedule('*/2 * * * *', async () => {
 
             const embed = messageEmbed(streamData, streamer)
             await client.channels.cache
-                .get(env === 'dev' ? '872851017925001227' : streamer['channel'])
+                .get(env === 'dev' ? channel["debug"] : streamer['channel'])
                 ?.send({
                     content: `Hey ! ${streamData['user_name']} lance son live @everyone`,
                     embeds: [embed]

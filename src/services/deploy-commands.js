@@ -7,11 +7,11 @@ const commands = [];
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
-    const {command} = await import(`../commands/${file}`)
+    const { command } = await import(`../commands/${file}`)
     commands.push(command.data.toJSON());
 }
 
-const rest = new REST({version: '9'}).setToken(token);
+const rest = new REST({ version: '9' }).setToken(token);
 
 (async () => {
     try {
@@ -22,14 +22,25 @@ const rest = new REST({version: '9'}).setToken(token);
 
         await rest.put(
             Routes.guildApplicationCommandsPermissions(clientId, guildId),
-            { body: [{
+            {
+                body: [
+                    {
                         id: '884461503015706685',
                         permissions: [{
                             id: '343169638336561154',
                             type: '2',
                             permission: true
                         }]
-                    }]
+                    },
+                    {
+                        id: '884912947145617488',
+                        permissions: [{
+                            id: '343169638336561154',
+                            type: '2',
+                            permission: true
+                        }],
+                    },
+                ]
             }
         )
         console.log('Commandes enregistrer avec succes');

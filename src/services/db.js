@@ -4,7 +4,7 @@ const { Sequelize, DataTypes } = _sequelize;
 import _streamers from "../models/streamers.js";
 import _dailySub from "../models/dailySub.js";
 
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: 'db.sqlite',
     logging: process.env.NODE_ENV === 'dev' ? console.log : false

@@ -3,6 +3,7 @@ import { Client, Collection, Intents } from 'discord.js';
 import { token } from './config.js';
 
 import('./tasks/twitchLive.js');
+import('./tasks/postDailySubs.js');
 import('./services/deploy-commands.js');
 
 export const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
