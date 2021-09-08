@@ -10,8 +10,11 @@ cron.schedule('0 9 * * *', async () => {
     const random = Math.floor(Math.random() * availableDaily.length)
     const content = availableDaily[random].url
 
-    await client.channels.cache
-        .get(env === 'dev' ? channel['debug'] : channel['dailySub'])
-        ?.send({ content: content })
-        .then(dailySub.update({ send: true }, { where: { url: content } }))
+    await client.channels.cache.get(env === 'dev' ? channel['debug'] : channel['dailySub'])
+        ?.send({ content: content, fetchReply: true })
+        .then(async res => {
+            await res.react('👍')
+            await res.react('👎')
+            await dailySub.update({ send: true }, { where: { url: content } })
+        }).catch(reason => console.log(reason))
 })
