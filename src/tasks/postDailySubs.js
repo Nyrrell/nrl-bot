@@ -4,7 +4,7 @@ import { client } from '../app.js'
 import { dailySub } from "../services/db.js";
 import { env, channel } from "../config.js";
 
-cron.schedule('0 9 * * *', async () => {
+cron.schedule('0 7 * * *', async () => {
 
     const availableDaily = await dailySub.findAll({ where: { send: false } })
     const random = Math.floor(Math.random() * availableDaily.length)
