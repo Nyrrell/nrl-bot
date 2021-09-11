@@ -7,7 +7,7 @@ import _dailySub from "../models/dailySub.js";
 export const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: 'db.sqlite',
-    logging: process.env.NODE_ENV === 'dev' ? console.log : false
+    logging: false
 });
 
 export const streamer = _streamers.init(sequelize, DataTypes)

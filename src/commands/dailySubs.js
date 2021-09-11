@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { dailySub } from "../services/db.js";
-import { channel, clientId } from "../config.js";
+import { channels, clientId } from "../config.js";
 
 export const command = {
     data: new SlashCommandBuilder()
@@ -28,7 +28,7 @@ export const command = {
         const channelId = interaction.channel.id
         const command = interaction.options.getSubcommand()
 
-        if (channelId !== channel['debug'] && channelId !== channel['dailySub'])
+        if (channelId !== channels['debug'] && channelId !== channels['dailySub'])
             return interaction.reply({ content: "Pas le bon channel", ephemeral: true })
 
 
