@@ -27,14 +27,14 @@ const isStreamLive = async (userName) => {
 }
 
 const checkClip = async (streamData) => {
-    channel.get(channels["clips"])
+
     const clips = await apiClient.clips.getClipsForBroadcasterPaginated(streamData['user_id'], { startDate: streamData['started_at'] }).getAll()
 
     for (const clip of clips) {
         if (!title.includes(streamData['title'])) title.push(streamData['title'])
         if (!title.includes(clip['title']) && !clipSend.includes(clip['url'])) {
             try {
-                await channel.send({
+                await channel.get(channels["clips"]).send({
                     embeds: [{
                         color: 'a970ff',
                         title: 'Nouveau clip'.concat("\u2800".repeat(25)),
@@ -45,7 +45,7 @@ const checkClip = async (streamData) => {
                         timestamp: clip['creationDate'],
                     }]
                 }).then(clipSend.push(clip['url']));
-                await channel.send({ content: clip['url'] })
+                await channel.get(channels["clips"]).send({ content: clip['url'] })
             } catch (e) {
                 console.log(e)
             }
