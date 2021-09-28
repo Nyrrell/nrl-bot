@@ -4,7 +4,7 @@ import { ApiClient } from '@twurple/api';
 import cron from 'node-cron'
 
 import { twitchClientId, twitchAccessToken, env, channels } from "../config.js";
-import { checkUptime } from "../utils/helpers.js";
+import { twitchUptime } from "../utils/helpers.js";
 import { streamer } from "../services/db.js";
 import { client } from '../app.js'
 
@@ -85,7 +85,7 @@ cron.schedule('*/2 * * * *', async () => {
     for (const streamer of streamers) {
         const { isLive, ...streamData } = await isStreamLive(streamer);
 
-        if (isLive && checkUptime(streamer['uptime'])) {
+        if (isLive && twitchUptime(streamer['uptime'])) {
             if (streamer['name'] === 'cirka_') {
                 title = []
                 clipSend = []
@@ -108,4 +108,4 @@ cron.schedule('*/2 * * * *', async () => {
             if (streamer['name'] === 'cirka_') await checkClip(streamData)
         }
     }
-}, { scheduled: true });
+}, { scheduled: true, timezone: "Europe/Paris" });

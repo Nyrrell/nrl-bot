@@ -10,9 +10,12 @@ export const twitchAccessToken = TWITCH_ACCESS_TOKEN;
 export const env = NODE_ENV
 
 export const channels = {
-    debug: '872851017925001227',
+    debug: '871675196560531486',
     dailySub: '429102841534349333',
-    clips: '351475175587577866'
+    clips: '351475175587577866',
+    botLogs: '892494572792451072',
+    gamesFolder: '516697956712185857',
+    archivesFolder: '670645106407112734',
 }
 
 if (env === 'dev') Object.keys(channels).forEach(k => channels[k] = "872851017925001227")
