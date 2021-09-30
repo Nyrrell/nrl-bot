@@ -1,0 +1,10 @@
+version: 3.9
+services:
+  app:
+    container_name: nrl-bot
+    image: nrl-bot
+    build:
+      context: .
+      target: nrl-bot
+    volumes:
+      - ./:/usr/app

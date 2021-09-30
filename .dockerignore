@@ -6,7 +6,7 @@
 *.iml
 out
 gen
-.git
+
 ### Node template
 # Logs
 logs
@@ -19,3 +19,9 @@ node_modules/
 # Optional npm cache directory
 .npm
 
+#
+
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
