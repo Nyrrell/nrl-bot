@@ -6,7 +6,7 @@ import _dailySub from "../models/dailySub.js";
 
 export const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: 'db.sqlite',
+    storage: './db/db.sqlite',
     logging: false
 });
 
