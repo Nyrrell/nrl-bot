@@ -1,6 +1,6 @@
 import { promisify } from 'util';
 import { client } from '../app.js'
-import { channels } from "../config.js";
+import { channelPrefix, channels } from "../config.js";
 
 export const wait = promisify(setTimeout)
 
@@ -18,7 +18,7 @@ export const diffDate = (input, method, diff) => {
 }
 
 export const sortChannel = async (category) => {
-    return await client.channels.cache.get(category)?.children.map(c => c.name.replace(/.*︱/gm, '')).sort()
+    return await client.channels.cache.get(category)?.children.map(c => c.name.replace(channelPrefix, '')).sort()
 }
 
 export const discordLogger = (status, data) => {
