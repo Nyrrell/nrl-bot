@@ -7,8 +7,10 @@ export const client = new Client({
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
 });
 client.commands = new Collection();
+client.filters = new Collection();
 
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+const filterFiles = fs.readdirSync('./src/filters').filter(file => file.endsWith('.js'));
 const eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
@@ -23,6 +25,11 @@ for (const file of eventFiles) {
     } else {
         client.on(event.name, (...args) => event.execute(...args));
     }
+}
+
+for (const file of filterFiles) {
+    const { filter } = await import(`./filters/${file}`)
+    client.filters.set(filter.name, filter);
 }
 
 await client.login(token);
