@@ -3,8 +3,19 @@ import { token } from './config.js';
 import * as fs from 'fs';
 
 export const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
-    partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+    intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+    ],
+    partials: [
+        'MESSAGE',
+        'CHANNEL',
+        'REACTION',
+        'GUILD_MEMBER',
+        'USER'
+    ],
 });
 client.commands = new Collection();
 client.filters = new Collection();

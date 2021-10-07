@@ -20,7 +20,7 @@ export const diffDate = (input, method, diff) => {
 export const sortChannel = async (category) => {
     return await client.channels.cache.get(category)?.children.map(c => c.name.replace(channelPrefix, '')).sort()
 }
-
+/** @status 'info, warn, error' */
 export const discordLogger = (status, data) => {
     let color;
     switch (status) {

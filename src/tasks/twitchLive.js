@@ -13,7 +13,7 @@ const apiClient = new ApiClient({ authProvider });
 
 let title = []
 let clipSend = []
-const channel = await client.channels.cache
+let channel = await client.channels.cache
 
 const isStreamLive = async (userName) => {
     const user = await apiClient.users.getUserByName(userName);
@@ -34,7 +34,8 @@ const checkClip = async (streamData) => {
         if (!title.includes(streamData['title'])) title.push(streamData['title'])
         if (!title.includes(clip['title']) && !clipSend.includes(clip['url'])) {
             try {
-                await channel.get(channels["clips"]).send({
+                channel = channel.get(channels["clips"])
+                await channel.send({
                     embeds: [{
                         color: 'a970ff',
                         title: 'Nouveau clip'.concat("\u2800".repeat(25)),
@@ -45,7 +46,7 @@ const checkClip = async (streamData) => {
                         timestamp: clip['creationDate'],
                     }]
                 }).then(clipSend.push(clip['url']));
-                await channel.get(channels["clips"]).send({ content: clip['url'] })
+                await channel.send({ content: `> ${clip['url']}` })
             } catch (e) {
                 console.log(e)
             }

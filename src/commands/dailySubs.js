@@ -5,7 +5,7 @@ import { channels, clientId } from "../config.js";
 export const command = {
     data: new SlashCommandBuilder()
         .setName('daily')
-        .setDescription('Daily post (Nyrrell)')
+        .setDescription('Daily post [Nyrrell]')
         .setDefaultPermission(false)
 
         .addSubcommand(subcommand =>
