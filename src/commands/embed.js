@@ -1,23 +1,65 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed, } from "discord.js";
+import { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed, Collection, } from "discord.js";
+import { color } from "../config.js";
 
 export const command = {
+  permissions: {},
   data: new SlashCommandBuilder()
     .setName('embed')
     .setDescription('Envoyer un message formater')
     .setDefaultPermission(false),
+  defer: new Collection(),
   async execute(interaction) {
 
-    const collector = interaction.channel.createMessageComponentCollector();
+    const { user, channel } = interaction
+    const { red, blue, green, yellow } = color
+    const deferred = this.defer.find((c, u) => u === user.id && c.channelId === channel.id)
+
+    if (deferred) {
+      const filter = (filter) => ['yes', 'no'].includes(filter.customId) && interaction.id === filter.message.interaction.id
+      await interaction.reply({ embeds: [{title: `❌  ${user.username} utilise déjà cette fonction dans ce channel`, description: 'Voulez vous forcer la fermeture ?', color: red}], ephemeral: true, components: [this.buttonYN] })
+       await interaction.channel.awaitMessageComponent({ filter }).then(async res => {
+        await res.deferUpdate().then(interaction.editReply({ components: [] }))
+        if (res.customId === 'yes') {
+          await deferred.stop('stop')
+          await interaction.editReply({ embeds: [{ title: '✅  Vous pouvez relancer la fonction', color: green }] })
+        }
+      })
+      return
+    }
+
+    const filter = (filter) => !['yes', 'no'].includes(filter.customId) && interaction.id === filter.message.interaction.id
+    const collector = channel.createMessageComponentCollector({ filter, idle: (60000 * 15) });
+    this.defer.set(user.id, collector)
     const embed = new MessageEmbed();
 
-    interaction.reply({ embeds: [{title: "Commencer par choisir un premier champ à ajouter", color: '#f1c40f'}], ephemeral: true, components: [this.select, this.button] })
+    interaction.reply({ embeds: [{title: "Commencer par choisir un premier élément à ajouter", color: blue}], ephemeral: true, components: [this.select, this.button] })
 
     const embedBuidler = async (method) => {
 
-      const filter = (filter) => filter.author.id === interaction.user.id
-      const content = (text, info) => `\\📝️ | **${text}** ${info ? "```" + info + "```" : ""}`
-      const error = (text) => `\\❌ | **${text}**`
+      const throwQuestion = (type, text, info = '') => {
+        let icon = ''
+        let color = 'DEFAULT'
+        switch (type) {
+          case 'base' : color = green; icon = '📝️'; break
+          case 'question' : color = yellow; icon = '💬'; break
+          case 'error' : color = red; icon = '❌'; break
+        }
+        const question = new MessageEmbed()
+          .setTitle(`${icon}  ${text}`)
+          .setDescription(`${info ? "```md\n" + info + "```" : ""}`)
+          .setColor(color)
+
+        return interaction.editReply({ embeds: [question], components: type === 'question' ? [this.buttonYN] : [] })
+      }
+
+      const userResponse = () => {
+        const filter = (filter) => filter.author.id === user.id
+        return channel.awaitMessages({ max: 1, filter }).then(message => {
+          message.first().delete()
+          return message.first().content !== '_blank' ? message.first().content : "\u200b"
+        })
+      }
 
       const contentChecker = async (type) => {
         let regex = ''
@@ -25,118 +67,99 @@ export const command = {
 
         switch (type) {
           case 'img': regex = /^https?:\/\/.*\/.*\.(png|gif|webp|jpeg|jpg)\??.*$/gmi; break
-          case 'url': regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gmi; break
+          case 'url': regex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_+.~#?&\/=]*)/gmi; break
           case 'color': regex = /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/gm; break
         }
 
         while (!regex.test(url)) {
-          await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-            url = message.first().content
-            message.first().delete()
-          })
-          await interaction.editReply({ content: error(`${type === 'color' ? 'La couleur' : 'Le lien'} n'est pas valide, merci de corriger ça !`) })
+          if (url) await throwQuestion('error',`${type === 'color' ? 'La couleur' : 'Le lien'} n'est pas valide, merci de corriger ça !`)
+          url = await userResponse()
         }
         return url
       }
 
       const answer = async () => {
-        let input = ''
-        let value = false
-        while (!['oui', 'non'].includes(input)) {
-          await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-            input = message.first().content
-            value = input === 'oui'
-            message.first().delete()
+        const filter = (filter) => ['yes', 'no'].includes(filter.customId) && interaction.id === filter.message.interaction.id
+        return channel.awaitMessageComponent({filter}).then(interaction => {
+          interaction.deferUpdate()
+          return interaction.customId === 'yes'
           })
-          if (!['oui', 'non'].includes(input))
-            await interaction.editReply({ content: error("Les réponses valides sont 'oui' ou 'non' !") })
-        }
-        return value
       }
 
       if (method === 'setTitle') {
-        await interaction.editReply({ content: content("Quel est le titre du message ?"), embeds: [], components: [] })
-        await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-          embed.setTitle(message.first().content)
-          message.first().delete()
-        })
-        if (!this.select.components[0].options.some(o => o.value === 'setURL'))
-          await this.select.components[0].addOptions([{ label: 'URL [Titre]', value: 'setURL' }])
+        await throwQuestion('base',"Quel est le titre du message ?")
+        embed.setTitle(await userResponse())
+
+        await throwQuestion('question',"Ajouter une url au titre ?")
+        const urlNeeded = await answer()
+        if (urlNeeded) {
+          await throwQuestion('base',"Quel est l'url à ajouter au titre ?")
+          embed.setURL(await contentChecker('url'))
+        }
 
       } else if (method === 'setDescription') {
-        await interaction.editReply({ content: content("Quel est le texte principal du message ?", "Hyperlien: [nom](url)"), embeds: [], components: [] })
-        await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-          message.first().delete()
-          embed.setDescription(message.first().content)
-        })
+        await throwQuestion('base',"Quel est le corps du message ?", "Hyperlien: [nom](url)")
+        embed.setDescription(await userResponse())
 
       } else if (method === 'setThumbnail') {
-        await interaction.editReply({ content: content("Quel est l'url de la miniature à ajouter ?"), embeds: [], components: [] })
+        await throwQuestion('base',"Quel est l'url de la miniature à ajouter ?")
         embed.setThumbnail(await contentChecker('img'))
 
       } else if (method === 'setImage') {
-        await interaction.editReply({ content: content("Quel est l'url de l'image à ajouter ?"), embeds: [], components: [] })
+        await throwQuestion('base',"Quel est l'url de l'image à ajouter ?")
         embed.setImage(await contentChecker('img'))
 
-      } else if (method === 'setURL') {
-        await interaction.editReply({ content: content("Quel est l'url à ajouter au titre ?"), embeds: [], components: [] })
-        embed.setURL(await contentChecker('url'))
-
       } else if (method === 'setColor') {
-        await interaction.editReply({ content: content("Quel est la couleur du message ?", "Couleur hexadécimal : www.color-hex.com"), embeds: [], components: [] })
+        await throwQuestion('base',"Quel est la couleur du message ?", "Couleur hexadécimal : www.color-hex.com")
         embed.setColor(await contentChecker('color'))
 
       } else if (method === 'setFooter') {
         let iconURL = ''
-        await interaction.editReply({ content: content("Quel est le texte du pied de page ?"), embeds: [], components: [] })
-        const text = await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-            message.first().delete()
-            return message.first().content
-        })
-        await interaction.editReply({ content: content("Ajouter l'url d'une image comme icône pour le footer ? __(oui/non)__") })
+        await throwQuestion('base',"Quel est le texte du pied de page ?")
+        const text = await userResponse()
+
+        await throwQuestion('question',"Ajouter l'url d'une image comme icône pour le footer ?")
         const iconNeeded = await answer()
         if (iconNeeded) {
-            await interaction.editReply({ content: content("Quel est l'url de l'icône ?") })
+          await throwQuestion('base',"Quel est l'url de l'icône ?")
             iconURL = await contentChecker('img')
         }
+
         embed.setFooter(text, iconURL)
 
       } else if (method === 'addField') {
-        await interaction.editReply({ content: content("Quel est le titre du champ ?", "Hyperlien: [nom](url) \nChamp vide: _blank"), embeds: [], components: [] })
-        const name = await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-          message.first().delete()
-          return message.first().content !== '_blank' ? message.first().content : "\u200b"
-        })
-        await interaction.editReply({ content: content("Quel est la valeur du champ ?", "Hyperlien: [nom](url) \nChamp vide: _blank") })
-        const value = await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-          console.log(message.first().content)
-          return message.first().content !== '_blank' ? message.first().content : "\u200b"
-        })
-        await interaction.editReply({ content: content("Le champ doit-il être afficher à la suite des autres ? __(oui/non)__", "Au moins 2 champs doivent avoir cette propriétés") })
+        await throwQuestion('base',"Quel est le titre du champ ?", "Champ vide: _blank")
+        const name = await userResponse()
+
+        await throwQuestion('base',"Quel est la valeur du champ ?", "Champ vide: _blank\nHyperlien: [nom](url)")
+        const value = await userResponse()
+
+        await throwQuestion('question',"Le champ doit-il être afficher à la suite des autres ?", "Au moins 2 champs doivent avoir cette propriétés pour 3 champs maximum côte à côte")
         const inline = await answer()
+
         embed.addField(name, value, inline)
 
       } else if (method === 'setAuthor') {
-          let iconURL = ''
-          let url = ''
-          await interaction.editReply({ content: content("Quel est l'auteur du message ?"), embeds: [], components: [] })
-          const name = await interaction.channel.awaitMessages({ max: 1, filter }).then(message => {
-            message.first().delete()
-            return message.first().content
-          })
-          await interaction.editReply({ content: content("Ajouter l'avatar de l'auteur ? __(oui/non)__") })
-          const avatarNeeded = await answer()
-          if (avatarNeeded) {
-            await interaction.editReply({ content: content("Quel est l'url de l'avatar ?") })
-            iconURL = await contentChecker('img')
-          }
-          await interaction.editReply({ content: content("Ajouter le site de l'auteur ? __(oui/non)__") })
-          const urlNeeded = await answer()
-          if (urlNeeded) {
-            await interaction.editReply({ content: content("Quel est l'url du site à ajouter ?") })
-            url = await contentChecker('url')
-          }
-          embed.setAuthor(name, iconURL, url)
+        let iconURL = ''
+        let url = ''
+        await throwQuestion('base',"Quel est l'auteur du message ?")
+        const name = await userResponse()
+
+        await throwQuestion('question',"Ajouter l'avatar de l'auteur ?")
+        const avatarNeeded = await answer()
+        if (avatarNeeded) {
+          await throwQuestion('base',"Quel est l'url de l'avatar ?")
+          iconURL = await contentChecker('img')
+        }
+
+        await throwQuestion('question',"Ajouter le site de l'auteur ?")
+        const urlNeeded = await answer()
+        if (urlNeeded) {
+          await throwQuestion('base',"Quel est l'url du site à ajouter ?")
+          url = await contentChecker('url')
+        }
+
+        embed.setAuthor(name, iconURL, url)
       }
 
       if (collector.total === 1) {
@@ -144,9 +167,9 @@ export const command = {
         await this.button.components[0].setDisabled(false)
       }
       try {
-        return await interaction.editReply({ content: '**- Embed preview -**', embeds: [embed], components: [this.select, this.button]})
+        return await interaction.editReply({ embeds: [embed], components: [this.select, this.button]})
       } catch (e) {
-        return await interaction.editReply({ content: `Une erreur est survenue : \n${e}`, embeds: [], components: [this.select, this.button]})
+        return await interaction.editReply({ embeds: [{title: `⚠️  Une erreur est survenue : \n${e}`, color: red}], components: []})
       }
     }
 
@@ -158,8 +181,9 @@ export const command = {
     });
 
     collector.on('end', (collected, reason) => {
-      if (reason !== 'send') return interaction.editReply({ content: '** Annulation de la creation du message **', embeds: [], components: []})
-      return interaction.channel.send({embeds: [embed]}).then(res => interaction.editReply({ content: `** Création terminé ! ** \`\`\`L'id du message est : ${res.id} \`\`\``, embeds: [], components: []}))
+      this.defer.delete(user.id)
+      if (reason === 'send') return channel.send({embeds: [embed]}).then(res => interaction.editReply({ embeds: [{title: '✅  Création terminé !', description: `\`\`\`L'id du message est : ${res.id} \`\`\``, color: green}], components: []}))
+      return interaction.editReply({ embeds: [{ title: (reason !== 'stop' ? '🛑  Arret automatique' : '‼️  Annulation de la creation du message'), color: red }], components: [] })
     });
   },
   select: new MessageActionRow()
@@ -187,8 +211,7 @@ export const command = {
           {
               label: 'Image',
               value: 'setImage',
-          }
-          ,
+          },
           {
               label: 'Footer',
               value: 'setFooter',
@@ -196,7 +219,7 @@ export const command = {
           {
               label: 'Auteur',
               value: 'setAuthor',
-          },
+          }
         ]),
     ),
   button : new MessageActionRow()
@@ -212,5 +235,18 @@ export const command = {
         .setCustomId('quit')
         .setLabel('Annuler')
         .setStyle('DANGER')
+    ),
+  buttonYN : new MessageActionRow()
+    .addComponents(
+      new MessageButton()
+        .setCustomId('yes')
+        .setStyle('SUCCESS')
+        .setEmoji('✔️')
+    )
+    .addComponents(
+      new MessageButton()
+        .setCustomId('no')
+        .setStyle('DANGER')
+        .setEmoji('✖️')
     )
 }

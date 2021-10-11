@@ -37,7 +37,7 @@ const checkClip = async (streamData) => {
                 channel = channel.get(channels["clips"])
                 await channel.send({
                     embeds: [{
-                        color: 'a970ff',
+                        color: '#a970ff',
                         title: 'Nouveau clip'.concat("\u2800".repeat(25)),
                         description: clip['title'],
                         footer: {
