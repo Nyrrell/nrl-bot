@@ -1,6 +1,6 @@
 import { promisify } from 'util';
 import { client } from '../app.js'
-import { channelPrefix, channels } from "../config.js";
+import { channelPrefix, channels, color } from "../config.js";
 
 export const wait = promisify(setTimeout)
 
@@ -22,16 +22,17 @@ export const sortChannel = async (category) => {
 }
 /** @status 'info, warn, error' */
 export const discordLogger = (status, data) => {
-    let color;
+    const { red, yellow, green } = color
+
     switch (status) {
         case 'info':
-            color = '#00c9a7'
+            status = green
             break
         case 'warn':
-            color = '#ffc75f'
+            status = yellow
             break
         case 'error':
-            color = '#ff6f91'
+            status = red
             break
     }
 
@@ -39,6 +40,6 @@ export const discordLogger = (status, data) => {
         embeds: [{
             author: { name: data['title'] },
             description: data['descr'],
-            color: color
+            color: status
         }]})
 }

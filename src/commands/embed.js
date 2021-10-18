@@ -3,7 +3,11 @@ import { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed, Colle
 import { color } from "../config.js";
 
 export const command = {
-  permissions: {},
+  permissions: {
+    id: '343169638336561154',
+    type: 'USER',
+    permission: true
+  },
   data: new SlashCommandBuilder()
     .setName('embed')
     .setDescription('Envoyer un message formater')
