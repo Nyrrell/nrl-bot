@@ -6,11 +6,9 @@ import _dailySub from "../models/dailySub.js";
 
 export const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: './db/db.sqlite',
+    storage: './share/db.sqlite',
     logging: false
 });
 
 export const streamer = _streamers.init(sequelize, DataTypes)
 export const dailySub = _dailySub.init(sequelize, DataTypes)
-//await dailySub.sync()
-
