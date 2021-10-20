@@ -6,5 +6,5 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./db:/usr/app/db
+      - ./share:/usr/app/share
     restart: unless-stopped
