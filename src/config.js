@@ -26,6 +26,7 @@ export const channels = {
   gamesFolder: '516697956712185857',
   archivesFolder: '670645106407112734',
   taverne: '140886312419983360',
+  tips: '203895099321483264',
 };
 if (env === 'dev') Object.keys(channels).forEach(k => channels[k] = "872851017925001227");
 
