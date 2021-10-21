@@ -23,11 +23,11 @@
     "dotenv": "^10.0.0",
     "node-cron": "^3.0.0",
     "pino": "^7.0.3",
+    "pino-pretty": "^7.1.0",
     "sequelize": "^6.6.5",
     "sqlite3": "^5.0.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.12",
-    "pino-pretty": "^7.1.0"
+    "nodemon": "^2.0.12"
   }
 }
