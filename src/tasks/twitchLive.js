@@ -6,6 +6,7 @@ import cron from 'node-cron'
 import { twitchClientId, twitchAccessToken, env, channels } from "../config.js";
 import { diffDate } from "../utils/helpers.js";
 import { streamer } from "../services/db.js";
+import logger from "../services/logger.js";
 import { client } from '../app.js'
 
 const authProvider = new StaticAuthProvider(twitchClientId, twitchAccessToken);
@@ -48,7 +49,7 @@ const checkClip = async (streamData) => {
                 }).then(clipSend.push(clip['url']));
                 await channel.send({ content: `> ${clip['url']}` })
             } catch (e) {
-                console.log(e)
+                logger.error(e)
             }
         }
     }

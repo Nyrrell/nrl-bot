@@ -1,3 +1,4 @@
+import logger from "../services/logger.js";
 import { clientId } from "../config.js";
 
 export const filter = {
@@ -14,7 +15,7 @@ export const filter = {
             await lastMessage.edit({ content: newContent })
             await message.delete()
         } catch (e) {
-            console.log(e)
+            logger.error(e)
         }
     }
 }

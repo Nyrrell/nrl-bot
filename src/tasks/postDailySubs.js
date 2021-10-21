@@ -1,8 +1,9 @@
 import cron from 'node-cron'
 
 import { client } from '../app.js'
-import { dailySub } from "../services/db.js";
 import { channels } from "../config.js";
+import logger from "../services/logger.js";
+import { dailySub } from "../services/db.js";
 
 cron.schedule('0 9 * * *', async () => {
 
@@ -16,7 +17,7 @@ cron.schedule('0 9 * * *', async () => {
                 await res.react('👍')
                 await res.react('👎')
                 await dailySub.update({ send: true }, { where: { url: content } })
-            }).catch(reason => console.log(reason))
+            }).catch(reason => logger.error(reason))
     },
     {
         timezone: "Europe/Paris"

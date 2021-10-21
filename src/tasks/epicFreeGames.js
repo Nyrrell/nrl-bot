@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import axios from "axios";
 
 import { client } from '../app.js';
+import logger from "../services/logger.js";
 import { channels, color } from "../config.js";
 
 const apiEpic = 'https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr'
@@ -53,7 +54,7 @@ cron.schedule('1 17 * * THU', async () => {
         ?.send({ embeds: embedFreeNow })
 
     } catch (e) {
-      console.log(e)
+      logger.error(e)
     }
   },
   {

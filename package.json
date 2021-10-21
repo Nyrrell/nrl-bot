@@ -1,6 +1,6 @@
 {
   "name": "nrl-bot",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Bot de la CRK TV",
   "main": "src/app.js",
   "type": "module",
@@ -22,10 +22,12 @@
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0",
     "node-cron": "^3.0.0",
+    "pino": "^7.0.3",
     "sequelize": "^6.6.5",
     "sqlite3": "^5.0.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "pino-pretty": "^7.1.0"
   }
 }

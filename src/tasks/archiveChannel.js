@@ -1,6 +1,7 @@
 import cron from 'node-cron'
 
 import { client } from '../app.js'
+import logger from "../services/logger.js";
 import { channels, channelPrefix } from "../config.js";
 import { diffDate, discordLogger, sortChannel } from "../utils/helpers.js";
 
@@ -23,6 +24,6 @@ cron.schedule('0 2 * * *', async () => {
       })
     )
   } catch (e) {
-    console.log(e)
+    logger.error(e)
   }
 }, { scheduled: true, timezone: "Europe/Paris" });

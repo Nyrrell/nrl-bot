@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { dailySub } from "../services/db.js";
 import { channels, clientId } from "../config.js";
+import { dailySub } from "../services/db.js";
+import logger from "../services/logger.js";
 
 export const command = {
   permissions: {
@@ -48,7 +49,7 @@ export const command = {
             await res.react('👎')
             await dailySub.update({ send: true }, { where: { url: content } })
           }
-        ).catch(error => console.log(error))
+        ).catch(error => logger.error(error))
 
     } else if (command === "refresh") {
       const lastMessage = await interaction.channel.messages.fetch()
@@ -57,7 +58,7 @@ export const command = {
       await lastMessage.edit({ content: content })
       return interaction.reply({ content: "Le daily à été modifié", ephemeral: true })
         .then(dailySub.update({ send: true }, { where: { url: content } }))
-        .catch(error => console.log(error))
+        .catch(error => logger.error(error))
 
     } else if (command === "add") {
 
@@ -72,7 +73,7 @@ export const command = {
             return interaction.reply({ content: content, ephemeral: true });
           });
       } catch (error) {
-        console.log(error)
+        logger.error(error)
         return interaction.reply({ content: 'Un problème est survenu', ephemeral: true });
       }
     }
