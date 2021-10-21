@@ -1,7 +1,7 @@
 version: 3.9
 services:
-  node:
-    container_name: bot
+  app:
+    container_name: app_bot
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,6 +11,6 @@ services:
     links:
       - redis
   redis:
-    container_name: redis
+    container_name: redis_bot
     image: redis:alpine
     restart: always
