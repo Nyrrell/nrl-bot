@@ -24,6 +24,7 @@
     "node-cron": "^3.0.0",
     "pino": "^7.0.3",
     "pino-pretty": "^7.1.0",
+    "redis": "^4.0.0-rc.3",
     "sequelize": "^6.6.5",
     "sqlite3": "^5.0.2"
   },

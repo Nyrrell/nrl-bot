@@ -40,6 +40,7 @@ cron.schedule('1 17 * * THU', async () => {
             },
             footer: {
               text: `La promotion se termine le ${new Date(gamePromotions['endDate']).toLocaleString('fr-FR', {
+                timeZone: 'Europe/Paris',
                 dateStyle: 'short',
                 timeStyle: 'short'
               }).replace(' ', ' à ')}`
