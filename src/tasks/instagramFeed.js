@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import axios from "axios";
 
 import { client } from '../app.js';
-import redis from "../services/redis.js";
+import { instagram } from "../services/keyv.js";
 import { MessageEmbed } from "discord.js";
 import logger from "../services/logger.js";
 import { channels } from "../config.js";
@@ -20,8 +20,8 @@ const descriptionPhoto = (html) => html['graphql']['user']['edge_owner_to_timeli
 cron.schedule('* * * * *', async () => {
     try {
       const html = await axios.get(baseURL).then(res => res.data)
-      if (await redis.get('lastPublication') !== lastPublication(html)) {
-        await redis.set('lastPublication', lastPublication(html))
+      if (await instagram.get('lastPublication') !== lastPublication(html)) {
+        await instagram.set('lastPublication', lastPublication(html))
         await client.channels.cache.get(channels['social'])
           ?.send({
             embeds: [

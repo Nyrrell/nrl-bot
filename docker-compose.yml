@@ -8,9 +8,3 @@ services:
     volumes:
       - ./share:/usr/app/share
     restart: unless-stopped
-    links:
-      - redis
-  redis:
-    container_name: redis_bot
-    image: redis:alpine
-    restart: always
