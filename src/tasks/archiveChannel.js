@@ -1,13 +1,15 @@
 import cron from 'node-cron'
 
-import { client } from '../app.js'
+import { channels, channelPrefix, guildId, color } from "../config.js";
+import { diffDate, sortChannel } from "../utils/helpers.js";
 import logger from "../services/logger.js";
-import { channels, channelPrefix } from "../config.js";
-import { diffDate, discordLogger, sortChannel } from "../utils/helpers.js";
+import { MessageEmbed } from "discord.js";
+import { client } from '../app.js'
 
 cron.schedule('0 2 * * *', async () => {
   try {
-    const gamesChannels = await client.channels.cache.get(channels['gamesFolder'])?.children
+    const guild = await client.guilds.cache.get(guildId)
+    const gamesChannels = await guild?.channels.cache.get(channels['gamesFolder'])?.children
 
     gamesChannels.each(async channel => await channel.messages.fetch({ limit: 1 })
       .then(async msg => {
@@ -16,9 +18,13 @@ cron.schedule('0 2 * * *', async () => {
         await channel.setParent(channels['archivesFolder'])
         const archivedList = await sortChannel(channels['archivesFolder'])
         await channel.setPosition(archivedList.indexOf(channel.name.replace(channelPrefix, '')))
-          .then(async res => await discordLogger('info', {
-              title: 'Archivage automatique',
-              descr: `Le salon <#${res.id}> a été déplacé dans la catégorie <#${res.parentId}> pour cause d'inactivité depuis 90 jours`
+          .then(async res => await guild.channels.cache.get(channels['botLogs'])?.send({
+              embeds: [
+                new MessageEmbed()
+                  .setAuthor('Archivage automatique')
+                  .setDescription(`Le salon <#${res.id}> a été déplacé dans la catégorie <#${res.parentId}> pour cause d'inactivité depuis 90 jours`)
+                  .setColor(color.green)
+              ]
             })
           )
       })

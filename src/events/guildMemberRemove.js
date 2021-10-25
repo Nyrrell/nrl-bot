@@ -1,4 +1,6 @@
+import { channels, color } from "../config.js";
 import logger from "../services/logger.js";
+import { MessageEmbed } from "discord.js";
 
 export const event = {
   name: 'guildMemberRemove',
@@ -6,10 +8,14 @@ export const event = {
   async execute(member) {
     if (member.user.bot) return
     try {
-      const { discordLogger } = await import('../utils/helpers.js')
-      await discordLogger('error', {
-        title: `👤  Utilisateur - ${member.user.username}`,
-        descr: `${member} vient de quitter le serveur`
+      await member.guild.channels.cache.get(channels['botLogs'])?.send({
+        embeds:
+          [
+            new MessageEmbed()
+              .setAuthor(`👤  Utilisateur - ${member.user.username}`)
+              .setDescription(`${member} vient de quitter le serveur`)
+              .setColor(color.red)
+          ]
       })
     } catch (error) {
       logger.error(error);

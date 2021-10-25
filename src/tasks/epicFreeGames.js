@@ -1,9 +1,10 @@
 import cron from 'node-cron';
 import axios from "axios";
 
-import { client } from '../app.js';
-import logger from "../services/logger.js";
 import { channels, color } from "../config.js";
+import logger from "../services/logger.js";
+import { MessageEmbed } from "discord.js";
+import { client } from '../app.js';
 
 const apiEpic = 'https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr'
 const embedFreeNow = []
@@ -30,22 +31,19 @@ cron.schedule('1 17 * * THU', async () => {
         const upcomingPromotions = game['promotions']?.['upcomingPromotionalOffers']
 
         if (gamePromotions?.['discountSetting']['discountPercentage'] === 0) {
-          embedFreeNow.push({
-            color: color.blue,
-            title: `${game['title']} est gratuit sur epic !`,
-            url: baseURL + game['urlSlug'],
-            description: game['description'],
-            thumbnail: {
-              url: thumbnail,
-            },
-            footer: {
-              text: `La promotion se termine le ${new Date(gamePromotions['endDate']).toLocaleString('fr-FR', {
+          embedFreeNow.push(
+            new MessageEmbed()
+              .setColor(color.blue)
+              .setTitle(`${game['title']} est gratuit sur epic !`)
+              .setURL(baseURL + game['urlSlug'])
+              .setDescription(game['description'])
+              .setThumbnail(thumbnail)
+              .setFooter(`La promotion se termine le ${new Date(gamePromotions['endDate']).toLocaleString('fr-FR', {
                 timeZone: 'Europe/Paris',
                 dateStyle: 'short',
                 timeStyle: 'short'
-              }).replace(' ', ' à ')}`
-            }
-          })
+              }).replace(' ', ' à ')}`)
+          )
         } /*else if (upcomingPromotions?.length) {
           embedUpcoming[0]['description'] += `[${game['title']}](${baseURL}), le ${new Date(game['effectiveDate']).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }).replace(' ', ' à ')}\n`
       }*/

@@ -19,12 +19,12 @@ try {
   const fullPermissions = []
 
   const permissionNeeded = await guild.commands.set(commands).then(res => {
-    logger.info('Commandes enregistrer avec succès');
+    logger.info('Commands successfully deploy');
     return res.filter(command => command['defaultPermission'] === false);
   })
 
-  await permissionNeeded.forEach(command => fullPermissions.push({ id: command.id, permissions: [client.commands.get(command.name)['permissions']]}))
-  await guild.commands.permissions.set({ fullPermissions }).then(() => logger.info('Permissions enregistrer avec succès'));
+  await permissionNeeded.forEach(command => fullPermissions.push({ id: command.id, permissions: [client.commands.get(command.name)['permissions']] }))
+  await guild.commands.permissions.set({ fullPermissions }).then(() => logger.info('Permissions register successfully'));
 
 } catch (error) {
   logger.error(error);

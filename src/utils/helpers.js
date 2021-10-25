@@ -1,6 +1,6 @@
 import { promisify } from 'util';
 import { client } from '../app.js'
-import { channelPrefix, channels, color, guildId } from "../config.js";
+import { channelPrefix } from "../config.js";
 
 export const wait = promisify(setTimeout)
 
@@ -19,27 +19,4 @@ export const diffDate = (input, method, diff) => {
 
 export const sortChannel = async (category) => {
     return await client.channels.cache.get(category)?.children.map(c => c.name.replace(channelPrefix, '')).sort()
-}
-/** @status 'info, warn, error' */
-export const discordLogger = (status, data) => {
-    const { red, yellow, green } = color
-
-    switch (status) {
-        case 'info':
-            status = green
-            break
-        case 'warn':
-            status = yellow
-            break
-        case 'error':
-            status = red
-            break
-    }
-
-    return client.guilds.cache.get(guildId).channels.cache.get(channels['botLogs'])?.send({
-        embeds: [{
-            author: { name: data['title'] },
-            description: data['descr'],
-            color: status
-        }]})
 }
