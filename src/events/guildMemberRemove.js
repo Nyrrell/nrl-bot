@@ -1,3 +1,5 @@
+import logger from "../services/logger.js";
+
 export const event = {
   name: 'guildMemberRemove',
   description: "When a member left the guild",
@@ -6,11 +8,11 @@ export const event = {
     try {
       const { discordLogger } = await import('../utils/helpers.js')
       await discordLogger('error', {
-        title: `👤  Utilisateur : ${member.username}`,
+        title: `👤  Utilisateur - ${member.user.username}`,
         descr: `${member} vient de quitter le serveur`
       })
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   },
 };

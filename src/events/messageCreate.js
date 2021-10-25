@@ -1,3 +1,5 @@
+import logger from "../services/logger.js";
+
 export const event = {
   name: 'messageCreate',
   description: "when a message is fired",
@@ -9,7 +11,7 @@ export const event = {
       if (!filter) return;
       filter.execute(message);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
   },
 };

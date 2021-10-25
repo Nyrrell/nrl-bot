@@ -1,6 +1,6 @@
 import { promisify } from 'util';
 import { client } from '../app.js'
-import { channelPrefix, channels, color } from "../config.js";
+import { channelPrefix, channels, color, guildId } from "../config.js";
 
 export const wait = promisify(setTimeout)
 
@@ -36,7 +36,7 @@ export const discordLogger = (status, data) => {
             break
     }
 
-    return client.channels.cache.get(channels['botLogs'])?.send({
+    return client.guilds.cache.get(guildId).channels.cache.get(channels['botLogs'])?.send({
         embeds: [{
             author: { name: data['title'] },
             description: data['descr'],

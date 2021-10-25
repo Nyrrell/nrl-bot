@@ -1,4 +1,5 @@
 import { channelPrefix, channels } from "../config.js";
+import logger from "../services/logger.js";
 
 export const filter = {
     name: 'isArchived',
@@ -19,7 +20,7 @@ export const filter = {
                 descr: `Le salon <#${message.channel.id}> a été déplacé dans la catégorie <#${message.channel.parentId}>`
             })
         } catch (error) {
-            console.error(error);
+            logger.error(error);
         }
     },
 };

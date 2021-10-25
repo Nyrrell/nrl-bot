@@ -1,3 +1,5 @@
+import logger from "../services/logger.js";
+
 export const filter = {
   name: 'purge',
   prefix: '>',
@@ -16,7 +18,7 @@ export const filter = {
     }
 
     message.channel.bulkDelete(amount, true).catch(err => {
-      console.error(err);
+      logger.error(err);
       message.channel.send('Il y\'a eu un problème lors de la tentative de suppression');
     });
 

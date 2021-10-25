@@ -1,3 +1,4 @@
+import logger from "../services/logger.js";
 import { channels } from "../config.js";
 
 export const event = {
@@ -8,12 +9,12 @@ export const event = {
 
     if (user.bot) return
     try {
-      await user.fetch()
-      member.client.channels.cache.get(channels['taverne'])?.send({
-      content: `${member} vient de débarquer sur le serveur **${guild.name}**, bienvenue 👋`
+      member.guild.channels.cache.get(channels['taverne'])?.send({
+      content: `${member} vient de débarquer sur le serveur **${guild.name}**, bienvenue 👋`,
+        allowedMentions: {user: []}
       })
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   },
 };

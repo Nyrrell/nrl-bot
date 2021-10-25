@@ -1,3 +1,5 @@
+import logger from "../services/logger.js";
+
 export const event = {
     name: 'interactionCreate',
     execute(interaction) {
@@ -7,7 +9,7 @@ export const event = {
         try {
             command.execute(interaction);
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             return interaction.reply({
                 content: 'Une erreur est survenue lors de l\'exécution de l\'interaction',
                 ephemeral: true
