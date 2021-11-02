@@ -12,8 +12,8 @@ export const event = {
         embeds:
           [
             new MessageEmbed()
-              .setAuthor(`👤  Utilisateur - ${member.user.username}`)
-              .setDescription(`${member} vient de quitter le serveur`)
+              .setAuthor(`👤  Utilisateur`)
+              .setDescription(`${member.user.username} vient de quitter le serveur`)
               .setColor(color.red)
           ]
       })

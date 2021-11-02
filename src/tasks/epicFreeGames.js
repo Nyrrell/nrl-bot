@@ -8,13 +8,9 @@ import { client } from '../app.js';
 
 const apiEpic = 'https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr'
 const embedFreeNow = []
-// const embedUpcoming = [{
-//   color: color.yellow,
-//   title: 'Prochain jeu gratuit sur epic !',
-//   description: ''
-// }]
 
-cron.schedule('1 17 * * THU', async () => {
+/* Tache cron à 15h GMT cause changement d'heures été/hiver */
+cron.schedule('1 15 * * THU', async () => {
     try {
       const freeGames = await axios.get(apiEpic).then(({ data }) => data['data']['Catalog']['searchStore']['elements'])
 
@@ -22,31 +18,30 @@ cron.schedule('1 17 * * THU', async () => {
 
         const baseURL = 'https://www.epicgames.com/store/p/'
 
-        let thumbnail
+        let thumbnail, cover
         for (const image of game['keyImages']) {
+          if (['OfferImageWide', 'DieselStoreFrontWide'].includes(image['type'])) cover = image['url']
           if (image['type'] === 'Thumbnail') thumbnail = image['url']
         }
 
         const gamePromotions = game['promotions']?.['promotionalOffers']['0']?.['promotionalOffers']['0']
-        const upcomingPromotions = game['promotions']?.['upcomingPromotionalOffers']
 
         if (gamePromotions?.['discountSetting']['discountPercentage'] === 0) {
           embedFreeNow.push(
             new MessageEmbed()
+              .setAuthor('Epic Games Store', 'https://cdn2.unrealengine.com/Unreal+Engine%2Feg-logo-filled-1255x1272-0eb9d144a0f981d1cbaaa1eb957de7a3207b31bb.png')
               .setColor(color.blue)
               .setTitle(`${game['title']} est gratuit sur epic !`)
               .setURL(baseURL + game['urlSlug'])
               .setDescription(game['description'])
-              .setThumbnail(thumbnail)
+              .setImage(cover || thumbnail)
               .setFooter(`La promotion se termine le ${new Date(gamePromotions['endDate']).toLocaleString('fr-FR', {
                 timeZone: 'Europe/Paris',
                 dateStyle: 'short',
                 timeStyle: 'short'
               }).replace(' ', ' à ')}`)
           )
-        } /*else if (upcomingPromotions?.length) {
-          embedUpcoming[0]['description'] += `[${game['title']}](${baseURL}), le ${new Date(game['effectiveDate']).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }).replace(' ', ' à ')}\n`
-      }*/
+        }
       }
 
       await client.channels.cache.get(channels['tips'])
@@ -57,5 +52,5 @@ cron.schedule('1 17 * * THU', async () => {
     }
   },
   {
-    timezone: "Europe/Paris"
+    timezone: "Europe/Dublin"
   })

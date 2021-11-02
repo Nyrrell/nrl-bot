@@ -8,6 +8,7 @@ import { instagram } from "../services/keyv.js";
 import { channels, guildId } from "../config.js";
 
 const baseURL = 'https://www.instagram.com/cirkajin/feed/?__a=1'
+
 const userName = (html) => html['graphql']['user']['full_name']
 const totalPhotos = (html) => html['graphql']['user']['edge_owner_to_timeline_media']['count']
 const userPhoto = (html) => html['graphql']['user']['profile_pic_url']
@@ -19,7 +20,7 @@ const descriptionPhoto = (html) => html['graphql']['user']['edge_owner_to_timeli
 
 cron.schedule('* * * * *', async () => {
     try {
-      const channel = client.guilds.cache.get(guildId)?.channels.cache.get(channels['social'])
+      const channel = await client.guilds.cache.get(guildId)?.channels.cache.get(channels['social'])
 
       const html = await axios.get(baseURL).then(res => res.data)
       if (await instagram.get('lastPublication') !== lastPublication(html)) {
