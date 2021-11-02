@@ -33,8 +33,12 @@ cron.schedule('* * * * *', async () => {
               .setTitle(`Nouvelle publication de ${userName(html)}`)
               .setURL(`https://www.instagram.com/p/${lastPublication(html)}/`)
               .setDescription(descriptionPhoto(html))
-              .setThumbnail(lastPhotoUrl(html))
-          ]
+              .setThumbnail(`attachment://${lastPublication(html)}.webp`)
+          ],
+          files: [{
+            attachment: lastPhotoUrl(html),
+            name: `${lastPublication(html)}.webp`
+          }]
         })
       }
     } catch (e) {
