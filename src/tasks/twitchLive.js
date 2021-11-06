@@ -74,7 +74,7 @@ cron.schedule('*/2 * * * *', async () => {
     const streamers = await streamer.findAll()
 
     for (const streamer of streamers) {
-      const { isLive, ...streamData } = await isStreamLive('mynthos');
+      const { isLive, ...streamData } = await isStreamLive(streamer);
 
       if (isLive && diffDate(streamer['uptime'], 'minute', 30)) {
         if (streamer['name'] === 'cirka_') {
