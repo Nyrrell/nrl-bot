@@ -9,8 +9,7 @@ import { client } from '../app.js';
 const apiEpic = 'https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr'
 const embedFreeNow = []
 
-/* Tache cron à 15h GMT cause changement d'heures été/hiver */
-cron.schedule('1 15 * * THU', async () => {
+cron.schedule('1 17 * * THU', async () => {
     try {
       const freeGames = await axios.get(apiEpic).then(({ data }) => data['data']['Catalog']['searchStore']['elements'])
 
@@ -52,5 +51,5 @@ cron.schedule('1 15 * * THU', async () => {
     }
   },
   {
-    timezone: "Europe/Dublin"
+    timezone: "Europe/Paris"
   })
