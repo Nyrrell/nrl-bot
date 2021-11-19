@@ -1,5 +1,6 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed, Collection, } from "discord.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import logger from "../services/logger.js";
 import { color } from "../config.js";
 
 export const command = {
@@ -76,7 +77,7 @@ export const command = {
         }
 
         while (!regex.test(url)) {
-          if (url) await throwQuestion('error',`${type === 'color' ? 'La couleur' : 'Le lien'} n'est pas valide, merci de corriger ça !`)
+          if (url) await throwQuestion('error', `${type === 'color' ? 'La couleur' : 'Le lien'} n'est pas valide, merci de corriger ça !`)
           url = await userResponse()
         }
         return url
@@ -84,61 +85,61 @@ export const command = {
 
       const answer = async () => {
         const filter = (filter) => ['yes', 'no'].includes(filter.customId) && interaction.id === filter.message.interaction.id
-        return channel.awaitMessageComponent({filter}).then(interaction => {
+        return channel.awaitMessageComponent({ filter }).then(interaction => {
           interaction.deferUpdate()
           return interaction.customId === 'yes'
-          })
+        })
       }
 
       if (method === 'setTitle') {
-        await throwQuestion('base',"Quel est le titre du message ?")
+        await throwQuestion('base', "Quel est le titre du message ?")
         embed.setTitle(await userResponse())
 
-        await throwQuestion('question',"Ajouter une url au titre ?")
+        await throwQuestion('question', "Ajouter une url au titre ?")
         const urlNeeded = await answer()
         if (urlNeeded) {
-          await throwQuestion('base',"Quel est l'url à ajouter au titre ?")
+          await throwQuestion('base', "Quel est l'url à ajouter au titre ?")
           embed.setURL(await contentChecker('url'))
         }
 
       } else if (method === 'setDescription') {
-        await throwQuestion('base',"Quel est le corps du message ?", "Hyperlien: [nom](url)")
+        await throwQuestion('base', "Quel est le corps du message ?", "Hyperlien: [nom](url)")
         embed.setDescription(await userResponse())
 
       } else if (method === 'setThumbnail') {
-        await throwQuestion('base',"Quel est l'url de la miniature à ajouter ?")
+        await throwQuestion('base', "Quel est l'url de la miniature à ajouter ?")
         embed.setThumbnail(await contentChecker('img'))
 
       } else if (method === 'setImage') {
-        await throwQuestion('base',"Quel est l'url de l'image à ajouter ?")
+        await throwQuestion('base', "Quel est l'url de l'image à ajouter ?")
         embed.setImage(await contentChecker('img'))
 
       } else if (method === 'setColor') {
-        await throwQuestion('base',"Quel est la couleur du message ?", "Couleur hexadécimal : www.color-hex.com")
+        await throwQuestion('base', "Quel est la couleur du message ?", "Couleur hexadécimal : www.color-hex.com")
         embed.setColor(await contentChecker('color'))
 
       } else if (method === 'setFooter') {
         let iconURL = ''
-        await throwQuestion('base',"Quel est le texte du pied de page ?")
+        await throwQuestion('base', "Quel est le texte du pied de page ?")
         const text = await userResponse()
 
-        await throwQuestion('question',"Ajouter l'url d'une image comme icône pour le footer ?")
+        await throwQuestion('question', "Ajouter l'url d'une image comme icône pour le footer ?")
         const iconNeeded = await answer()
         if (iconNeeded) {
-          await throwQuestion('base',"Quel est l'url de l'icône ?")
-            iconURL = await contentChecker('img')
+          await throwQuestion('base', "Quel est l'url de l'icône ?")
+          iconURL = await contentChecker('img')
         }
 
         embed.setFooter(text, iconURL)
 
       } else if (method === 'addField') {
-        await throwQuestion('base',"Quel est le titre du champ ?", "Champ vide: _blank")
+        await throwQuestion('base', "Quel est le titre du champ ?", "Champ vide: _blank")
         const name = await userResponse()
 
-        await throwQuestion('base',"Quel est la valeur du champ ?", "Champ vide: _blank\nHyperlien: [nom](url)")
+        await throwQuestion('base', "Quel est la valeur du champ ?", "Champ vide: _blank\nHyperlien: [nom](url)")
         const value = await userResponse()
 
-        await throwQuestion('question',"Le champ doit-il être afficher à la suite des autres ?", "Au moins 2 champs doivent avoir cette propriétés pour 3 champs maximum côte à côte")
+        await throwQuestion('question', "Le champ doit-il être afficher à la suite des autres ?", "Au moins 2 champs doivent avoir cette propriétés pour 3 champs maximum côte à côte")
         const inline = await answer()
 
         embed.addField(name, value, inline)
@@ -146,20 +147,20 @@ export const command = {
       } else if (method === 'setAuthor') {
         let iconURL = ''
         let url = ''
-        await throwQuestion('base',"Quel est l'auteur du message ?")
+        await throwQuestion('base', "Quel est l'auteur du message ?")
         const name = await userResponse()
 
-        await throwQuestion('question',"Ajouter l'avatar de l'auteur ?")
+        await throwQuestion('question', "Ajouter l'avatar de l'auteur ?")
         const avatarNeeded = await answer()
         if (avatarNeeded) {
-          await throwQuestion('base',"Quel est l'url de l'avatar ?")
+          await throwQuestion('base', "Quel est l'url de l'avatar ?")
           iconURL = await contentChecker('img')
         }
 
-        await throwQuestion('question',"Ajouter le site de l'auteur ?")
+        await throwQuestion('question', "Ajouter le site de l'auteur ?")
         const urlNeeded = await answer()
         if (urlNeeded) {
-          await throwQuestion('base',"Quel est l'url du site à ajouter ?")
+          await throwQuestion('base', "Quel est l'url du site à ajouter ?")
           url = await contentChecker('url')
         }
 
@@ -171,23 +172,42 @@ export const command = {
         await this.button.components[0].setDisabled(false)
       }
       try {
-        return await interaction.editReply({ embeds: [embed], components: [this.select, this.button]})
+        return await interaction.editReply({ embeds: [embed], components: [this.select, this.button] })
       } catch (e) {
         return await interaction.editReply({ embeds: [{title: `⚠️  Une erreur est survenue : \n${e}`, color: red}], components: []})
       }
     }
 
     collector.on('collect', async collected => {
-      await collected.deferUpdate()
-      if (collected.customId === 'embedBuilder') await embedBuidler(collected['values'][0])
-      if (collected.customId === 'quit') collector.stop('stop')
-      if (collected.customId === 'send') collector.stop('send')
+      try {
+        await collected.deferUpdate()
+        if (collected.customId === 'embedBuilder') await embedBuidler(collected['values'][0])
+        if (collected.customId === 'quit') collector.stop('stop')
+        if (collected.customId === 'send') collector.stop('send')
+      } catch (e) {
+        logger.error(e)
+      }
     });
 
     collector.on('end', (collected, reason) => {
-      this.defer.delete(user.id)
-      if (reason === 'send') return channel.send({embeds: [embed]}).then(res => interaction.editReply({ embeds: [{title: '✅  Création terminé !', description: `\`\`\`L'id du message est : ${res.id} \`\`\``, color: green}], components: []}))
-      return interaction.editReply({ embeds: [{ title: (reason !== 'stop' ? '🛑  Arret automatique' : '‼️  Annulation de la creation du message'), color: red }], components: [] })
+      try {
+        this.defer.delete(user.id)
+        if (reason === 'send') return channel.send({ embeds: [embed] }).then(res => interaction.editReply({
+          embeds: [{
+            title: '✅  Création terminé !',
+            description: `\`\`\`L'id du message est : ${res.id} \`\`\``,
+            color: green
+          }], components: []
+        }))
+        return interaction.editReply({
+          embeds: [{
+            title: (reason !== 'stop' ? '🛑  Arret automatique' : '‼️  Annulation de la creation du message'),
+            color: red
+          }], components: []
+        })
+      } catch (e) {
+        logger.error(e)
+      }
     });
   },
   select: new MessageActionRow()
@@ -197,36 +217,36 @@ export const command = {
         .setPlaceholder('Quel type de champ ajouter ?')
         .addOptions([
           {
-              label: 'Titre',
-              value: 'setTitle',
+            label: 'Titre',
+            value: 'setTitle',
           },
           {
-              label: 'Description',
-              value: 'setDescription',
+            label: 'Description',
+            value: 'setDescription',
           },
           {
-              label: 'Champs',
-              value: 'addField',
+            label: 'Champs',
+            value: 'addField',
           },
           {
-              label: 'Thumbnail',
-              value: 'setThumbnail',
+            label: 'Thumbnail',
+            value: 'setThumbnail',
           },
           {
-              label: 'Image',
-              value: 'setImage',
+            label: 'Image',
+            value: 'setImage',
           },
           {
-              label: 'Footer',
-              value: 'setFooter',
+            label: 'Footer',
+            value: 'setFooter',
           },
           {
-              label: 'Auteur',
-              value: 'setAuthor',
+            label: 'Auteur',
+            value: 'setAuthor',
           }
         ]),
     ),
-  button : new MessageActionRow()
+  button: new MessageActionRow()
     .addComponents(
       new MessageButton()
         .setCustomId('send')
@@ -240,7 +260,7 @@ export const command = {
         .setLabel('Annuler')
         .setStyle('DANGER')
     ),
-  buttonYN : new MessageActionRow()
+  buttonYN: new MessageActionRow()
     .addComponents(
       new MessageButton()
         .setCustomId('yes')
