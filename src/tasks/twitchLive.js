@@ -1,7 +1,6 @@
 import { StaticAuthProvider } from '@twurple/auth';
 import { getRawData } from '@twurple/common'
 import { ApiClient } from '@twurple/api';
-import cron from 'node-cron'
 
 import { twitchClientId, twitchAccessToken, env, channels } from "../config.js";
 import { diffDate } from "../utils/helpers.js";
@@ -69,7 +68,8 @@ const messageEmbed = (streamData, userData) => {
     .setTimestamp(new Date())
 }
 
-cron.schedule('*/2 * * * *', async () => {
+
+export const twitchLive = async () => {
   try {
     const streamers = await streamer.findAll()
 
@@ -102,4 +102,4 @@ cron.schedule('*/2 * * * *', async () => {
   } catch (e) {
     logger.error(e)
   }
-}, { scheduled: true, timezone: "Europe/Paris" });
+}

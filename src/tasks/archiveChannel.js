@@ -1,12 +1,10 @@
-import cron from 'node-cron'
-
 import { channels, channelPrefix, guildId, color } from "../config.js";
 import { diffDate, sortChannel } from "../utils/helpers.js";
 import logger from "../services/logger.js";
 import { MessageEmbed } from "discord.js";
 import { client } from '../app.js'
 
-cron.schedule('0 2 * * *', async () => {
+export const archiveChannel = async () => {
   try {
     const guild = await client.guilds.cache.get(guildId)
     const gamesChannels = await guild?.channels.cache.get(channels['gamesFolder'])?.children
@@ -32,4 +30,4 @@ cron.schedule('0 2 * * *', async () => {
   } catch (e) {
     logger.error(e)
   }
-}, { scheduled: true, timezone: "Europe/Paris" });
+}
