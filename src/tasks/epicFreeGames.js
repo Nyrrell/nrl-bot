@@ -5,12 +5,11 @@ import logger from "../services/logger.js";
 import { MessageEmbed } from "discord.js";
 import { client } from '../app.js';
 
-const apiEpic = 'https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr'
-const embedFreeNow = []
-
 export const getEpicFreeGames = async () => {
   try {
+    const apiEpic = 'https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr'
     const freeGames = await axios.get(apiEpic).then(({ data }) => data['data']['Catalog']['searchStore']['elements'])
+    const embedFreeNow = []
 
     for (const game of freeGames) {
 

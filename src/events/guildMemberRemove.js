@@ -1,4 +1,4 @@
-import { channels, color } from "../config.js";
+import { channels, color, guildId } from "../config.js";
 import logger from "../services/logger.js";
 import { MessageEmbed } from "discord.js";
 
@@ -6,7 +6,7 @@ export const event = {
   name: 'guildMemberRemove',
   description: "When a member left the guild",
   async execute(member) {
-    if (member.user.bot) return
+    if (member.user.bot || member.guild.id !== guildId) return
     try {
       await member.guild.channels.cache.get(channels['botLogs'])?.send({
         embeds:

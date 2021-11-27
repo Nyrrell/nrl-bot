@@ -1,5 +1,6 @@
 import logger from "../services/logger.js";
-import { channels } from "../config.js";
+import { channels, guildId } from "../config.js";
+
 
 export const event = {
   name: 'guildMemberAdd',
@@ -7,11 +8,12 @@ export const event = {
   async execute(member) {
     const { user, guild } = member
 
-    if (user.bot) return
+    if (member.user.bot || member.guild.id !== guildId) return;
+
     try {
       member.guild.channels.cache.get(channels['taverne'])?.send({
-      content: `${member} vient de débarquer sur le serveur **${guild.name}**, bienvenue 👋`,
-        allowedMentions: {user: []}
+      content: `<@${user.id}> vient de débarquer sur le serveur **${guild.name}**, bienvenue ${user.username} 👋`,
+        allowedMentions: {users: []}
       })
     } catch (error) {
       logger.error(error);
