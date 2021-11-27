@@ -18,7 +18,7 @@ export const instagramFeed = async () => {
 
     const lastPhotoUrl = lastPublication['display_url']
     const lastPublicationCode = lastPublication['shortcode']
-    const descriptionPhoto = lastPublication['edge_media_to_caption']['edges'][0]['node']['text']
+    const descriptionPhoto = lastPublication['edge_media_to_caption']['edges'][0]?.['node']['text']
 
     if (await instagram.get('lastPublication') !== lastPublicationCode) {
       await instagram.set('lastPublication', lastPublicationCode)
@@ -29,7 +29,7 @@ export const instagramFeed = async () => {
             .setAuthor('Instagram', 'https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png')
             .setTitle(`Nouvelle publication de ${userName}`)
             .setURL(`https://www.instagram.com/p/${lastPublicationCode}/`)
-            .setDescription(descriptionPhoto)
+            .setDescription(descriptionPhoto ? descriptionPhoto : "")
             .setThumbnail(`attachment://${lastPublicationCode}.webp`)
         ],
         files: [{
