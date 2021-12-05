@@ -1,7 +1,7 @@
 version: 3.9
 services:
   app:
-    container_name: app_bot
+    container_name: nrl-bot-app
     build:
       context: .
       dockerfile: Dockerfile
