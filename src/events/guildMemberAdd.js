@@ -11,7 +11,7 @@ export const event = {
 
     try {
       member.guild.channels.cache.get(channels['taverne'])?.send({
-      content: `<@${user.id}> vient de débarquer sur le serveur **${guild.name}**, bienvenue ${user.username} 👋`,
+      content: `<@!${user.id}> vient de débarquer sur le serveur **${guild.name}**, bienvenue ${user.username} 👋`,
       })
     } catch (error) {
       logger.error(error);
