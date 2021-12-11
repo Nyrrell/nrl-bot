@@ -12,7 +12,6 @@ export const primeGames = async () => {
     const storeURL = 'https://gaming.amazon.com/loot/'
     const currentOffer = []
 
-    const clientId = await axios.get('https://twitch.tv').then(res => res.data.match(/"Client-ID":\s*"(\w*)",/i)[1])
     const primeOfferContent = await axios.post("https://gql.twitch.tv/gql", {
       "operationName": "Prime_PrimeOfferList_PrimeOffers_Eligibility",
       "variables": {},
@@ -25,7 +24,7 @@ export const primeGames = async () => {
     }, {
       headers: {
         "Accept-Language": "fr-FR",
-        "Client-Id": clientId
+        "Client-Id": "kimne78kx3ncx6brgo4mv6wki5h1ko"
       }
     }).then(({ data }) => data.data?.['primeOffersWithEligibility'])
 
