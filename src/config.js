@@ -6,6 +6,7 @@ const {
   DISCORD_GUILD_ID,
   TWITCH_CLIENT_ID,
   TWITCH_ACCESS_TOKEN,
+  YOUTUBE_API_KEY,
   NODE_ENV
 } = process.env;
 
@@ -16,6 +17,8 @@ export const guildId = DISCORD_GUILD_ID;
 export const twitchClientId = TWITCH_CLIENT_ID;
 export const twitchAccessToken = TWITCH_ACCESS_TOKEN;
 export const env = NODE_ENV;
+
+export const youtubeApiKey = YOUTUBE_API_KEY;
 
 export const channelPrefix = /.*︱/gm;
 export const channels = {

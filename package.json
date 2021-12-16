@@ -1,6 +1,6 @@
 {
   "name": "nrl-bot",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Bot de la CRK TV",
   "main": "src/app.js",
   "type": "module",
