@@ -20,8 +20,8 @@ cron.schedule('*/10 * * * *', async () => {
   await instagramFeed();
 }, { timezone: timezone });
 
-// Epic Free Games
-cron.schedule('10 17 * * THU', async () => {
+// Epic Free Games // TODO ? THU ONLY
+cron.schedule('10 17 * * *', async () => {
   await getEpicFreeGames();
 }, { timezone: timezone });
 
