@@ -1,16 +1,16 @@
 import axios from "axios";
 
 import { client } from '../app.js';
+import { channels } from "../config.js";
 import { MessageEmbed } from "discord.js";
 import logger from "../services/logger.js";
-import { instagram } from "../services/keyv.js";
-import { channels, guildId } from "../config.js";
+import { instagramKeyv } from "../services/keyv.js";
 
 const baseURL = 'https://www.instagram.com/cirkajin/feed/?__a=1'
 
 export const instagramFeed = async () => {
   try {
-    const channel = await client.guilds.cache.get(guildId)?.channels.cache.get(channels['social'])
+    const channel = await client.channels.cache.get(channels['social'])
 
     const data = await axios.get(baseURL).then(res => res.data['graphql']?.['user'])
     const lastPublication = data['edge_owner_to_timeline_media']?.['edges'][0]['node']
@@ -20,8 +20,8 @@ export const instagramFeed = async () => {
     const lastPublicationCode = lastPublication['shortcode']
     const descriptionPhoto = lastPublication['edge_media_to_caption']['edges'][0]?.['node']['text']
 
-    if (await instagram.get('lastPublication') !== lastPublicationCode) {
-      await instagram.set('lastPublication', lastPublicationCode)
+    if (await instagramKeyv.get('lastPublication') !== lastPublicationCode) {
+      await instagramKeyv.set('lastPublication', lastPublicationCode)
       await channel?.send({
         embeds: [
           new MessageEmbed()

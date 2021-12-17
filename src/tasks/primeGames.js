@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { channels, color, guildId } from "../config.js";
-import { primeGaming } from "../services/keyv.js";
+import { primeGamingKeyv } from "../services/keyv.js";
 import logger from "../services/logger.js";
 import { MessageEmbed } from "discord.js";
 import { client } from '../app.js';
@@ -31,8 +31,8 @@ export const primeGames = async () => {
     for (const offer of primeOfferContent) {
       currentOffer.push(offer['id'])
 
-      if (!await primeGaming.has(offer['id'])) {
-        await primeGaming.set(offer['id'], true)
+      if (!await primeGamingKeyv.has(offer['id'])) {
+        await primeGamingKeyv.set(offer['id'], true)
 
         let description = ""
         if (offer['deliveryMethod'] === "DIRECT_ENTITLEMENT" || offer['tags'].includes('FGWP')) {
@@ -56,9 +56,9 @@ export const primeGames = async () => {
       }
     }
 
-    const storedOffer = await primeGaming.iterator()
+    const storedOffer = await primeGamingKeyv.iterator()
     for await(const offer of storedOffer) {
-      if (!currentOffer.includes(offer[0])) await primeGaming.delete(offer[0])
+      if (!currentOffer.includes(offer[0])) await primeGamingKeyv.delete(offer[0])
     }
 
   } catch (e) {
