@@ -18,11 +18,11 @@ export const youtubeFeed = async () => {
 
     const videos = [] = await youtubeApi.get(`search?channelId=${youtubeChannel}&part=snippet,id&order=date`).then(({ data }) => data['items'])
 
-    const storedVideos = await youtubeKeyv.get('latestVideos') || [];
+    const storedVideos = await youtubeKeyv.get('latestVideos');
     const videosId = videos.map(video => video['id']['videoId']);
 
     for await (const video of videos) {
-      if (storedVideos.includes(video['id']['videoId'])) return;
+      if (storedVideos.includes(video['id']['videoId'])) continue;
 
       await channel?.send({
         embeds: [
