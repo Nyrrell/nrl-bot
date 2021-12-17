@@ -35,9 +35,9 @@ export const youtubeFeed = async () => {
             .setThumbnail(video['snippet']['thumbnails']['high']['url'])
         ]
       });
-    }
-    await youtubeKeyv.set("latestVideos", videosId);
 
+      await youtubeKeyv.set("latestVideos", videosId);
+    }
   } catch (e) {
     logger.error(e);
   }
