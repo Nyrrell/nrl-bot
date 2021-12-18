@@ -4,7 +4,7 @@ import { MessageEmbed } from "discord.js";
 import { client } from '../app.js';
 import logger from "../services/logger.js";
 import { youtubeKeyv } from "../services/keyv.js";
-import { channels, youtubeApiKey } from "../config.js";
+import { channels, guildId, youtubeApiKey } from "../config.js";
 
 const youtubeApi = axios.create({
   baseURL: 'https://www.googleapis.com/youtube/v3/',
@@ -14,17 +14,17 @@ const youtubeApi = axios.create({
 export const youtubeFeed = async () => {
   try {
     const youtubeChannel = 'UCJaHTyjOkFEcHFPbywErwjg';
-    const channel = await client.channels.cache.get(channels['social']);
+    const channel = await client.guilds.cache.get(guildId)?.channels.cache.get(channels['social']);
 
     const videos = [] = await youtubeApi.get(`search?channelId=${youtubeChannel}&part=snippet,id&order=date`).then(({ data }) => data['items'])
-
-    const storedVideos = await youtubeKeyv.get('latestVideos');
     const videosId = videos.map(video => video['id']['videoId']);
 
-    for await (const video of videos) {
-      if (storedVideos.includes(video['id']['videoId'])) continue;
+    const storedVideos = await youtubeKeyv.get('latestVideos');
 
-      await channel?.send({
+    for await (const video of videos) {
+      if (storedVideos?.includes(video['id']['videoId'])) continue;
+
+      await channel.send({
         embeds: [
           new MessageEmbed()
             .setColor('#ff0000')
