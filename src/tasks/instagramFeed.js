@@ -1,44 +1,49 @@
+import { MessageAttachment, MessageEmbed } from "discord.js";
 import axios from "axios";
 
 import { client } from '../app.js';
-import { channels } from "../config.js";
-import { MessageEmbed } from "discord.js";
 import logger from "../services/logger.js";
+import { channels, guildId } from "../config.js";
 import { instagramKeyv } from "../services/keyv.js";
 
-const baseURL = 'https://www.instagram.com/cirkajin/feed/?__a=1'
+const instagramApi = axios.create({
+  baseURL: 'https://www.instagram.com/'
+});
 
 export const instagramFeed = async () => {
   try {
-    const channel = await client.channels.cache.get(channels['social'])
+    const channel = await client.guilds.cache.get(guildId)?.channels.cache.get(channels['social']);
 
-    const data = await axios.get(baseURL).then(res => res.data['graphql']?.['user'])
-    const lastPublication = data['edge_owner_to_timeline_media']?.['edges'][0]['node']
-    const userName = data['full_name']
+    const userData = await instagramApi.get('cirkajin/feed/?__a=1').then(({ data }) => data['graphql']?.['user']);
+    const latestPublications = userData['edge_owner_to_timeline_media']?.['edges'];
+    const publicationsId = latestPublications.map(({ node }) => node['id']);
 
-    const lastPhotoUrl = lastPublication['display_url']
-    const lastPublicationCode = lastPublication['shortcode']
-    const descriptionPhoto = lastPublication['edge_media_to_caption']['edges'][0]?.['node']['text']
+    const storedPublications = await instagramKeyv.get('latestPublications');
 
-    if (await instagramKeyv.get('lastPublication') !== lastPublicationCode) {
-      await instagramKeyv.set('lastPublication', lastPublicationCode)
-      await channel?.send({
+    for (const { node: publication } of latestPublications) {
+      if (storedPublications?.includes(publication['id'])) continue;
+
+      await channel.send({
         embeds: [
           new MessageEmbed()
             .setColor('#DD2A7B')
             .setAuthor('Instagram', 'https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png')
-            .setTitle(`Nouvelle publication de ${userName}`)
-            .setURL(`https://www.instagram.com/p/${lastPublicationCode}/`)
-            .setDescription(descriptionPhoto ? descriptionPhoto : "")
-            .setThumbnail(`attachment://${lastPublicationCode}.webp`)
+            .setTitle(`Nouvelle publication de ${userData['full_name']}`)
+            .setURL(`https://www.instagram.com/p/${publication['shortcode']}/`)
+            .setDescription(publication['edge_media_to_caption']['edges'][0]?.['node']['text'] || "")
+            .setThumbnail(`attachment://${publication['shortcode']}.webp`)
         ],
-        files: [{
-          attachment: lastPhotoUrl,
-          name: `${lastPublicationCode}.webp`
-        }]
+        files: [
+          new MessageAttachment(
+            publication['display_url'],
+            `${publication['shortcode']}.webp`
+          )
+        ]
       })
+
+      await instagramKeyv.set('latestPublications', publicationsId);
     }
   } catch (e) {
-    logger.error(e)
+    logger.error(e);
   }
 }
