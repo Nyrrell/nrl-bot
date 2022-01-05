@@ -1,6 +1,6 @@
 {
   "name": "nrl-bot",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Bot de la CRK TV",
   "main": "src/app.js",
   "type": "module",
@@ -26,7 +26,7 @@
     "node-cron": "^3.0.0",
     "pino": "^7.0.3",
     "pino-pretty": "^7.1.0",
-    "sequelize": "^6.12.0-alpha.1",
+    "sequelize": "^7.0.0-alpha.4",
     "sqlite3": "^5.0.2"
   },
   "devDependencies": {
