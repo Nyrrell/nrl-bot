@@ -7,6 +7,7 @@ const {
   TWITCH_CLIENT_ID,
   TWITCH_ACCESS_TOKEN,
   YOUTUBE_API_KEY,
+  INSTAGRAM_APP_ID,
   NODE_ENV
 } = process.env;
 
@@ -20,6 +21,8 @@ export const env = NODE_ENV;
 
 export const youtubeApiKey = YOUTUBE_API_KEY;
 
+export const instagramAppID = INSTAGRAM_APP_ID;
+
 export const channelPrefix = /.*︱/gm;
 export const channels = {
   debug: '871675196560531486',
@@ -30,7 +33,8 @@ export const channels = {
   archivesFolder: '670645106407112734',
   taverne: '140886312419983360',
   tips: '203895099321483264',
-  social: '870309123487572059'
+  social: '870309123487572059',
+  rainyday: '975927584682561557'
 };
 if (env === 'dev') Object.keys(channels).forEach(k => channels[k] = "872851017925001227");
 
@@ -40,4 +44,4 @@ export const color = {
   green: '#27ae60',
   yellow: '#f1c40f',
   red: '#c0392b',
-}
+};
