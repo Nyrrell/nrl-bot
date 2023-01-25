@@ -8,7 +8,11 @@ import { channels, guildId, instagramAppID } from "../config.js";
 
 const instagramApi = axios.create({
   baseURL: 'https://i.instagram.com/api/v1/users/web_profile_info/',
-  headers: { 'X-IG-App-ID': instagramAppID },
+  headers: {
+		'X-IG-App-ID': instagramAppID,
+		'sec-fetch-site': 'same-origin',
+		'sec-fetch-mode': 'cors',
+	},
 });
 
 const usernames = ["cirkajin", "rainydayfr"];
