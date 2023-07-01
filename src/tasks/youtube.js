@@ -13,8 +13,9 @@ const youtubeApi = axios.create({
 
 export const youtubeFeed = async () => {
   try {
-    const youtubeChannel = 'UCJaHTyjOkFEcHFPbywErwjg';
-    const uploadPlaylist = 'UUJaHTyjOkFEcHFPbywErwjg';
+//    const youtubeChannel = 'UCJaHTyjOkFEcHFPbywErwjg';
+//    const uploadPlaylist = 'UUJaHTyjOkFEcHFPbywErwjg';
+    const uploadPlaylist = 'UUc67sFEZzCEtKWPfLRFQf5Q';
 
     const channel = await client.guilds.cache.get(guildId)?.channels.cache.get(channels['social']);
 

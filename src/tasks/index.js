@@ -15,11 +15,6 @@ cron.schedule('*/2 * * * *', async () => {
   await twitchLive();
 }, { timezone: timezone });
 
-// Instagram
-cron.schedule('*/10 * * * *', async () => {
-  await instagramFeed();
-}, { timezone: timezone });
-
 // Epic Free Games // TODO ? THU ONLY
 cron.schedule('10 17 * * *', async () => {
   await getEpicFreeGames();
@@ -35,8 +30,9 @@ cron.schedule('0 9 * * *', async () => {
   await postDailySubs();
 }, { timezone: timezone });
 
-// Prime Games
+// Once per hour
 cron.schedule('0 * * * *', async () => {
   await primeGames();
   await youtubeFeed();
+  await instagramFeed();
 }, { timezone: timezone });
