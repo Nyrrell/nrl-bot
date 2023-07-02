@@ -26,7 +26,7 @@ cron.schedule('0 2 * * *', async () => {
 }, { timezone: timezone });
 
 // Post daily subs
-cron.schedule('0 9 * * *', async () => {
+cron.schedule('0 8 * * *', async () => {
   await postDailySubs();
 }, { timezone: timezone });
 
