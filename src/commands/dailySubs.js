@@ -1,11 +1,11 @@
+import { MessageActionRow, MessageButton } from "discord.js";
+import { channels, dailySubsEmbedUrl, devId } from "../config.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { channels, clientId } from "../config.js";
-import { dailySub } from "../services/db.js";
 import logger from "../services/logger.js";
 
 export const command = {
   permissions: {
-    id: '343169638336561154',
+    id: devId,
     type: 'USER',
     permission: true
   },
@@ -13,24 +13,10 @@ export const command = {
     .setName('daily')
     .setDescription('Daily post [Nyrrell]')
     .setDefaultPermission(false)
-
     .addSubcommand(subcommand =>
-      subcommand.setName('add')
-        .setDescription('Ajouter des liens dans la base de donnée')
-        .addStringOption(option => option.setName("links")
-          .setDescription('Les liens à ajouter séparer par un espace')
-          .setRequired(true)))
-
-    .addSubcommand(subcommand =>
-      subcommand.setName('new')
-        .setDescription('Y\'a pas eu de daily ?'))
-
-    .addSubcommand(subcommand =>
-      subcommand.setName('refresh')
-        .setDescription('Le daily est pété :(')),
+      subcommand.setName('new').setDescription('Y\'a pas eu de daily ?')),
 
   async execute(interaction) {
-
     const channelId = interaction.channel.id
     const command = interaction.options.getSubcommand()
 
@@ -38,44 +24,58 @@ export const command = {
       return interaction.reply({ content: "Pas le bon channel", ephemeral: true })
 
 
-    const availableDaily = await dailySub.findAll({ where: { send: false } })
-    const random = Math.floor(Math.random() * availableDaily.length)
-    const content = availableDaily[random].url
-
     if (command === "new") {
-      await interaction.reply({ content: content, fetchReply: true })
-        .then(async res => {
-            await res.react('👍')
-            await res.react('👎')
-            await dailySub.update({ send: true }, { where: { url: content } })
-          }
-        ).catch(error => logger.error(error))
-
-    } else if (command === "refresh") {
-      const lastMessage = await interaction.channel.messages.fetch()
-        .then(messages => messages.filter(user => user.author.id === clientId).first())
-
-      await lastMessage.edit({ content: content })
-      return interaction.reply({ content: "Le daily à été modifié", ephemeral: true })
-        .then(dailySub.update({ send: true }, { where: { url: content } }))
-        .catch(error => logger.error(error))
-
-    } else if (command === "add") {
-
-      const links = interaction.options.getString('links')
-        .split(' ').map(entries => Object.assign({ url: entries }))
-
-      try {
-        await dailySub.bulkCreate(links, { ignoreDuplicates: true })
-          .then(async res => {
-            const row = await dailySub.findAll({ where: { createdAt: res[0]?.dataValues.createdAt } });
-            const content = row.length === 1 ? `${row.length} lien a été ajouté` : `${row.length} liens ont été ajoutés`;
-            return interaction.reply({ content: content, ephemeral: true });
-          });
-      } catch (error) {
-        logger.error(error)
-        return interaction.reply({ content: 'Un problème est survenu', ephemeral: true });
+      if (!interaction.client.dailySubs?.size) {
+        const { getGifs } = await import("../tasks/postDailySubs.js");
+        await getGifs();
       }
+
+      const dailySubs = interaction.client.dailySubs;
+      dailySubs.get("gifs")
+      await interaction.reply({
+        content: dailySubsEmbedUrl + dailySubs.get("gifs")[dailySubs.get("index")], ephemeral: true, components: this.components
+      });
+
+      const collector = interaction.channel.createMessageComponentCollector();
+      collector.on('collect', async (collected) => {
+        await collected.deferUpdate();
+        if (collected.customId === "valid") {
+          interaction.editReply({ content: "Envoyé", components: [] }).catch(error => logger.error(error))
+          interaction.channel.send({ content: dailySubsEmbedUrl + dailySubs.get("gifs")[dailySubs.get("index")] })
+              .then(async res => {
+                await res.react('👍')
+                await res.react('👎')
+              })
+            .catch(error => logger.error(error));
+          interaction.client.dailySubs = null;
+          return collector.stop();
+        } else if (collected.customId === "quit") {
+          interaction.client.dailySubs = null;
+          collector.stop();
+          return interaction.editReply({ content: "Annulation", components: [] }).catch(error => logger.error(error))
+        }
+
+        dailySubs.set("index", (collected.customId === "next" ? dailySubs.get("index")+1 : dailySubs.get("index")-1));
+
+        dailySubs.get("index") >= 1
+          ? collected.message.components[0].components[0].setDisabled(false)
+          : collected.message.components[0].components[0].setDisabled(true);
+
+        interaction.editReply({ content: dailySubsEmbedUrl + dailySubs.get("gifs")[dailySubs.get("index")], components: collected.message.components })
+            .catch(error => logger.error(error))
+      });
+    } else if (command === "refresh") {
+      return interaction.reply({ content: "DEPRECATED", ephemeral: true });
+    } else if (command === "add") {
+      return interaction.reply({ content: "DEPRECATED", ephemeral: true });
     }
   },
+  components: [
+    new MessageActionRow()
+      .addComponents(new MessageButton().setCustomId('previous').setLabel('Précédent').setStyle('PRIMARY').setDisabled(true))
+      .addComponents(new MessageButton().setCustomId('next').setLabel('Suivant').setStyle('PRIMARY')),
+    new MessageActionRow()
+      .addComponents(new MessageButton().setCustomId('quit').setLabel('Quitter').setStyle('DANGER'))
+      .addComponents(new MessageButton().setCustomId('valid').setLabel('Envoyer').setStyle('SUCCESS'))
+  ],
 };
