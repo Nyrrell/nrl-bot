@@ -1,10 +1,10 @@
 import logger from "../services/logger.js";
-import { clientId } from "../config.js";
+import { clientId, devId } from "../config.js";
 
 export const filter = {
     name: 'edit',
     condition(message) {
-        return message.content.startsWith('>edit') && message.author.id === '343169638336561154'
+        return message.content.startsWith('>edit') && message.author.id === devId
     },
     async execute(message) {
         try {

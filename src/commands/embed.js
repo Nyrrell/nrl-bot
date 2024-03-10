@@ -1,11 +1,11 @@
 import { MessageActionRow, MessageButton, MessageSelectMenu, MessageEmbed, Collection, } from "discord.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import logger from "../services/logger.js";
-import { color } from "../config.js";
+import { color, devId } from "../config.js";
 
 export const command = {
   permissions: {
-    id: '343169638336561154',
+    id: devId,
     type: 'USER',
     permission: true
   },

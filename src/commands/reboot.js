@@ -1,9 +1,10 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import logger from "../services/logger.js";
+import { devId } from "../config.js";
 
 export const command = {
   permissions: {
-    id: '343169638336561154',
+    id: devId,
     type: 'USER',
     permission: true
   },
@@ -12,7 +13,7 @@ export const command = {
     .setDescription('Redémarre le bot [Nyrrell]')
     .setDefaultPermission(false),
   async execute(interaction) {
-    await logger.log('Reboot incoming');
+    logger.info('Reboot incoming');
     await interaction.reply({ content: 'Reboot incoming', ephemeral: true });
     process.exit();
   },

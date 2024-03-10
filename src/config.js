@@ -1,42 +1,36 @@
 import "dotenv/config";
 
-const {
-  DISCORD_TOKEN,
-  DISCORD_CLIENT_ID,
-  DISCORD_GUILD_ID,
-  TWITCH_CLIENT_ID,
-  TWITCH_ACCESS_TOKEN,
-  YOUTUBE_API_KEY,
-  INSTAGRAM_APP_ID,
-  NODE_ENV
+export const {
+  DISCORD_TOKEN: token,
+  DISCORD_CLIENT_ID: clientId,
+  DISCORD_GUILD_ID: guildId,
+  TWITCH_CLIENT_ID: twitchClientId,
+  TWITCH_ACCESS_TOKEN: twitchAccessToken,
+  YOUTUBE_API_KEY: youtubeApiKey,
+  INSTAGRAM_APP_ID: instagramAppID,
+  DAILY_SUBS_TOKEN_URL: dailySubsTokenUrl,
+  DAILY_SUBS_GIFS_URL: dailySubsGifsUrl,
+  DAILY_SUBS_EMBED_URL: dailySubsEmbedUrl,
+  DEV_ID: devId,
+  NODE_ENV: env
 } = process.env;
 
-export const token = DISCORD_TOKEN;
-export const clientId = DISCORD_CLIENT_ID;
-export const guildId = DISCORD_GUILD_ID;
-
-export const twitchClientId = TWITCH_CLIENT_ID;
-export const twitchAccessToken = TWITCH_ACCESS_TOKEN;
-export const env = NODE_ENV;
-
-export const youtubeApiKey = YOUTUBE_API_KEY;
-
-export const instagramAppID = INSTAGRAM_APP_ID;
-
 export const channelPrefix = /.*︱/gm;
+const CHANNELS = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.startsWith("CHANNEL")))
 export const channels = {
-  debug: '871675196560531486',
-  dailySub: '429102841534349333',
-  clips: '351475175587577866',
-  botLogs: '892494572792451072',
-  gamesFolder: '516697956712185857',
-  archivesFolder: '670645106407112734',
-  taverne: '140886312419983360',
-  tips: '203895099321483264',
-  social: '870309123487572059',
-  rainyday: '975927584682561557'
+  debug: CHANNELS.CHANNEL_DEBUG,
+  dailySub: CHANNELS.CHANNEL_DAILYSUB,
+  clips: CHANNELS.CHANNEL_CLIPS,
+  botLogs: CHANNELS.CHANNEL_BOTLOGS,
+  gamesFolder: CHANNELS.CHANNEL_GAMESFOLDER,
+  archivesFolder: CHANNELS.CHANNEL_ARCHIVESFOLDER,
+  taverne: CHANNELS.CHANNEL_TAVERNE,
+  tips: CHANNELS.CHANNEL_TIPS,
+  social: CHANNELS.CHANNEL_SOCIAL,
+  rainyday: CHANNELS.CHANNEL_RAINYDAY,
+  devDebug: CHANNELS.CHANNEL_DEV_DEBUG
 };
-if (env === 'dev') Object.keys(channels).forEach(k => channels[k] = "872851017925001227");
+if (env === 'dev') Object.keys(channels).forEach(k => channels[k] = channels.devDebug);
 
 
 export const color = {
