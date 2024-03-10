@@ -1,13 +1,12 @@
 {
   "name": "nrl-bot",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Bot de la CRK TV",
   "main": "src/app.js",
   "type": "module",
   "scripts": {
     "dev": "NODE_ENV=dev nodemon .",
-    "start": "node .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ."
   },
   "author": "Nyrrell",
   "license": "MIT",
@@ -20,16 +19,17 @@
     "@twurple/chat": "^5.0.1",
     "@twurple/common": "^5.0.1",
     "@twurple/eventsub": "^5.0.1",
-    "axios": "^0.24.0",
+    "axios": "^1.6.7",
     "discord.js": "^13.3.1",
     "dotenv": "^10.0.0",
     "node-cron": "^3.0.0",
     "pino": "^7.0.3",
     "pino-pretty": "^7.1.0",
-    "sequelize": "^7.0.0-alpha.4",
-    "sqlite3": "^5.0.2"
+    "sequelize": "^6.37.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "nodemon": "^2.0.12"
+    "nodemon": "^2.0.12",
+    "prettier": "^2.8.3"
   }
 }
